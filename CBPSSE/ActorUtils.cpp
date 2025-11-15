@@ -183,6 +183,7 @@ bool actorUtils::IsBoneInWhitelist(Actor* actor, std::string boneName)
     return false;
 }
 
+/* 3.1.0:
 const actorUtils::EquippedArmor actorUtils::GetActorEquippedArmor(Actor* actor, UInt32 slot)
 {
     bool isEquipped = false;
@@ -215,6 +216,52 @@ const actorUtils::EquippedArmor actorUtils::GetActorEquippedArmor(Actor* actor, 
 
     return actorUtils::EquippedArmor{ nullptr, nullptr };
 }
+*/ 
+
+/* BETA, needs testing: Replacement, for f4se 0.7.4 RickMccl */
+const actorUtils::EquippedArmor actorUtils::GetActorEquippedArmor(Actor* actor, UInt32 slot)
+{
+    if (!actorUtils::IsActorValid(actor))
+    {
+        logger.Error("GetActorEquippedArmor: Actor is not valid\n");
+        return actorUtils::EquippedArmor{ nullptr, nullptr };
+    }
+
+    // actor->biped is the BipedAnim / equip data used elsewhere (see PapyrusActor::GetWornItem)
+    auto biped = actor->biped.get();
+    if (!biped || !biped->object)
+    {
+        logger.Error("GetActorEquippedArmor: Actor has no biped/equip data\n");
+        return actorUtils::EquippedArmor{ nullptr, nullptr };
+    }
+
+    // Defensive: ensure slot index is in a reasonable range (BIPED_OBJECT typically has 0x20 entries)
+    // If the underlying array bounds are unknown at compile-time, rely on caller correctness.
+    auto & slotEntry = biped->object[slot];
+
+    const TESForm* armorForm = nullptr;
+    const TESForm* modelForm = nullptr;
+
+    // parent.object holds the equipped TESForm (armor)
+    if (slotEntry.parent.object)
+        armorForm = slotEntry.parent.object;
+
+    // many equip structures expose an armorAddon / model pointer (Papyrus uses armorAddon)
+    // try to read it if present
+    // Member name 'armorAddon' exists in the runtime structures used by PapyrusActor::GetWornItem
+    // If not present on your headers, this will be a no-op; otherwise it yields the model/form.
+    modelForm = slotEntry.armorAddon ? slotEntry.armorAddon : nullptr;
+
+    if (!armorForm && !modelForm)
+    {
+        logger.Info("GetActorEquippedArmor: no item in slot %u for actor %08x\n", slot, actor->formID);
+        return actorUtils::EquippedArmor{ nullptr, nullptr };
+    }
+
+    return actorUtils::EquippedArmor{ armorForm, modelForm };
+}
+
+
 
 UInt64 actorUtils::BuildActorKey(Actor* actor)
 {
