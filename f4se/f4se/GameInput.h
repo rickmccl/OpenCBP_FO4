@@ -58,7 +58,7 @@ public:
 	float			timer;		// 3C (hold duration)
 };
 
-//static_assert(sizeof(ButtonEvent) == 0x40, "ButtonEvent size mismatch");
+static_assert(sizeof(ButtonEvent) == 0x40, "ButtonEvent size mismatch");
 
 // 30
 class CharacterEvent : public InputEvent
@@ -88,7 +88,7 @@ class ThumbstickEvent : public IDEvent, public InputEvent
 public:
 	UInt32 unk20[6];
 };
-//static_assert(sizeof(ThumbstickEvent) == 0x048, "ThumbstickEvent size mismatch");
+static_assert(sizeof(ThumbstickEvent) == 0x048, "ThumbstickEvent size mismatch");
 
 // 30
 class DeviceConnectEvent : public InputEvent
@@ -104,7 +104,7 @@ class KinectEvent : public IDEvent, public InputEvent
 public:
 	UInt32 unk28[4];
 };
-//static_assert(sizeof(KinectEvent) == 0x040, "KinectEvent size mismatch");
+static_assert(sizeof(KinectEvent) == 0x040, "KinectEvent size mismatch");
 
 // EF0
 class InputEventTable

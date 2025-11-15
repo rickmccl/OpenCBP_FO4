@@ -18,6 +18,7 @@
 #include "f4se/GameRTTI.h"
 #include "f4se_common/Utilities.h"
 #include "f4se/GameData.h"
+#include "f4se/GameInput.h"
 
 #define DEBUG 0
 #pragma warning(disable : 4996)
