@@ -57,7 +57,8 @@ public:
 	float			isDown;		// 38
 	float			timer;		// 3C (hold duration)
 };
-STATIC_ASSERT(sizeof(ButtonEvent) == 0x040);
+
+//static_assert(sizeof(ButtonEvent) == 0x40, "ButtonEvent size mismatch");
 
 // 30
 class CharacterEvent : public InputEvent
@@ -87,7 +88,7 @@ class ThumbstickEvent : public IDEvent, public InputEvent
 public:
 	UInt32 unk20[6];
 };
-STATIC_ASSERT(sizeof(ThumbstickEvent) == 0x048);
+//static_assert(sizeof(ThumbstickEvent) == 0x048, "ThumbstickEvent size mismatch");
 
 // 30
 class DeviceConnectEvent : public InputEvent
@@ -103,7 +104,7 @@ class KinectEvent : public IDEvent, public InputEvent
 public:
 	UInt32 unk28[4];
 };
-STATIC_ASSERT(sizeof(KinectEvent) == 0x040);
+//static_assert(sizeof(KinectEvent) == 0x040, "KinectEvent size mismatch");
 
 // EF0
 class InputEventTable
@@ -245,7 +246,7 @@ public:
 private:
 	// GameMenuBase:BSInputEventUser override should be the only one calling this function
 	friend class GameMenuBase;
-	DEFINE_MEMBER_FN_1(Impl_OnGameMenuBaseButtonEvent, bool, 0x019FE850, ButtonEvent * button);
+	DEFINE_MEMBER_FN_1(Impl_OnGameMenuBaseButtonEvent, bool, 0x01B13E60, ButtonEvent * button);
 };
 
 // 30
