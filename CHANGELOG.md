@@ -1,11 +1,26 @@
 ---
 
 # 🛠️ OpenCBP_FO4  
-## Updated for Anniversary Edition Fallout 4  
-### Game Version: `1.11.137`  
-### F4SE Version: `0.7.4`  
+### Game Version: `1.11.159`  
+### F4SE Version: `0.7.5`  
+
+## 🔄 Changes
+
+### F4SE
+-update f4se code to 0.7.5
+--update f4se.vcxproj
+--update f4se_common.vcxproj
+---Add include path "$(SolutionDir)\..\.." instead of modifying utilities.h
+### CBPSSE
+-update cbpsse.vcxproj for 1.11.159 / 0x010B09F0
+-update main.cpp for runtime version
+
+#TODO: Need new magic number for 1.11.159 hook
 
 ---
+
+### Game Version: `1.11.137`  
+### F4SE Version: `0.7.4`  
 
 ## 🔄 Changes
 
