@@ -14,8 +14,7 @@
 ### CBPSSE
 -update cbpsse.vcxproj for 1.11.159 / 0x010B09F0
 -update main.cpp for runtime version
-
-#TODO: Need new magic number for 1.11.159 hook
+-Address Library reveals New magic number is 0x1B18B40 
 
 ---
 
