@@ -108,7 +108,7 @@ extern "C"
 
         0,	// not version independent
         0,	// not version independent (extended field)
-        { RUNTIME_VERSION_1_11_159, 0 },	// compatible with 1.11.159  11/18/2025 RickM
+        { RUNTIME_VERSION_1_11_169, 0 },	
 
         0,	// works with any version of the script extender. you probably do not need to put anything here
     };
@@ -129,7 +129,7 @@ extern "C"
             logger.Error("loaded in editor, marking as incompatible\n");
             return false;
         }
-        else if (f4se->runtimeVersion != RUNTIME_VERSION_1_11_159)
+        else if (f4se->runtimeVersion != RUNTIME_VERSION_1_11_169)
         {
             logger.Error("unsupported runtime version %08X", f4se->runtimeVersion);
             return false;

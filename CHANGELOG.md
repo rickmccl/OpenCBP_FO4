@@ -1,10 +1,28 @@
 ---
-
 # 🛠️ OpenCBP_FO4  
+### Game Version: `1.11.169`  
+### F4SE Version: `0.7.6`  
+
+##  Changes
+
+### F4SE
+-replace f4se code with 0.7.6
+-'Retarget Solution' (VS 2022)
+--update f4se_common.vcxproj
+---Add include path "$(SolutionDir)\..\.." instead of modifying utilities.h (???) 
+### CBPSSE
+-update cbpsse.vcxproj for 1.11.169 / 0x010B0A90
+-update main.cpp for runtime version
+-update hookd3d.cpp for new magic number ... pending Address Library
+
+No code changes, only version updates and hook address update.
+
+---
+
 ### Game Version: `1.11.159`  
 ### F4SE Version: `0.7.5`  
 
-## 🔄 Changes
+##  Changes
 
 ### F4SE
 -update f4se code to 0.7.5
@@ -21,7 +39,7 @@
 ### Game Version: `1.11.137`  
 ### F4SE Version: `0.7.4`  
 
-## 🔄 Changes
+## Changes
 
 ### `\common`
 - `common\common_vc11.vcxproj`  

@@ -195,7 +195,7 @@ void hk_ProcessEventQueue_Internal(void *thisPtr)
 
 // See f4se/Hooks_Threads.cpp
 // TODO someday address library.  someday.
-RelocPtr <void*> ProcessEventQueue_Internal(0x1B18B40);
+RelocPtr <void*> ProcessEventQueue_Internal(0x1B194C0);
 
 /*
 Address library data: use addresslibdecoder.exe on their 'bin' files to get this data. Looking for index 2287625
@@ -203,6 +203,7 @@ version-1-10-984-0.txt:207049:2287625   1A09CB0
 version-1-11-137-0.txt:198184:2287625   1B1DFA0
 RickM 11/14/2025
 1-11-159 0x1B18B40
+1-11-169 1B194C0
 */
 
 
