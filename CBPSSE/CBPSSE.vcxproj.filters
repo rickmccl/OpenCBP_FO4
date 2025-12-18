@@ -170,6 +170,9 @@
     <ClCompile Include="..\f4se\f4se\GameUtilities.cpp">
       <Filter>Source Files\api</Filter>
     </ClCompile>
+    <ClCompile Include="..\f4se\f4se\GameData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">

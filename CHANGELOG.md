@@ -1,5 +1,27 @@
 ---
 # 🛠️ OpenCBP_FO4  
+### Game Version: `1.11.191`  
+### F4SE Version: `0.7.7`  
+
+## Changes
+-retarget all solutions for VS 2026 ('latest')
+--!! Except OpenCBP uses "AMP" which is no longer available in VS 2026.
+###F4SE
+-replace f4se code with 0.7.7
+-f4se_common.vcxproj: add include path  "$(SolutionDir)\F4SE" 
+--update RUNTIME_VERSION to new value from f4se_version.h: 0x010B0BF0
+-f4se\f4se.vcxproj:
+--edit to one "..\":   <ProjectReference Include="..\common\common\common.vcxproj">
+--AdditionalLibraryPath: $(SolutionDir)$(Platform)_$(PlatformToolset)\$(Configuration)
+-f4se\f4se.sln:
+-- change reference to "common_vc11" to "common.vcxproj"
+
+
+###CBPSSE 
+-cbpsse.vcxproj:  update AdditionalDependencies to "f4se_1_11_191.lib"
+-main.cpp: update F4SEPluginVersionData
+-hookD3D.cpp: update magic number
+
 ### Game Version: `1.11.169`  
 ### F4SE Version: `0.7.6`  
 
@@ -9,11 +31,11 @@
 -replace f4se code with 0.7.6
 -'Retarget Solution' (VS 2022)
 --update f4se_common.vcxproj
----Add include path "$(SolutionDir)\..\.." instead of modifying utilities.h (???) 
+---Add include path "$(SolutionDir)\F4SE"
 ### CBPSSE
 -update cbpsse.vcxproj for 1.11.169 / 0x010B0A90
 -update main.cpp for runtime version
--update hookd3d.cpp for new magic number ... pending Address Library
+-update hookd3d.cpp for new magic number 
 
 No code changes, only version updates and hook address update.
 
