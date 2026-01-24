@@ -263,3 +263,6 @@ __pycache__/
 # omit skse64
 skse64/
 /skse64_se
+
+# The files to be merged in
+CBPSSE-0.4/
