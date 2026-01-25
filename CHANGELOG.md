@@ -1,5 +1,35 @@
 ---
-# 🛠️ OpenCBP_FO4  
+# 🛠️ OpenCBP_FO4 `3.4.191`
+
+### Game Version: `1.11.191`  
+### F4SE Version: `0.7.7`  
+
+## Changes
+
+### 🔧 Merge from Worthless99’s “FPS Fix with MCM Menu” (CBPSSE)
+- Mod Configuration Menu integration  
+- Physics optimizations: FPS fix
+- Physics performance tuning: max actors, activation/deactivation distances  
+- Removal of AMP  
+- Logging improvements  
+- General code cleanups and modernization  
+
+### 🔨 Additional updates 
+- version resource created for dll
+- Revised logging system:  
+  - Runtime toggle: `loggingEnabled=false` in the INI disables logging  
+  - Deduplication: repeated messages are collapsed  
+  - Former “Error” messages now correctly labeled as `[Notice]`  
+
+---
+
+Many thanks to Worthless99 for their work on  
+**OCBP and OCBPC FO4 – FPS Fix with MCM Menu**  
+https://www.nexusmods.com/fallout4/mods/95003  
+Source available on Nexus.
+
+---
+# 🛠️ OpenCBP_FO4  `3.1.191`
 ### Game Version: `1.11.191`  
 ### F4SE Version: `0.7.7`  
 
