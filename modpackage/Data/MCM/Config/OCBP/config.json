@@ -1,0 +1,117 @@
+{
+  "modName": "OCBP",
+  "displayName": "OCBP Configuration",
+  "minMcmVersion": 2,
+  "pluginRequirements": [],
+  "content": [
+    {
+      "text": "OCBP Configuration",
+      "type": "section"
+    },
+    {
+      "text": "OCBP FO4 is a physics modification plugin for Fallout 4 that provides custom body physics. This menu allows you to configure settings through MCM interface.",
+      "type": "text"
+    }
+  ],
+  "pages": [
+    {
+      "pageDisplayName": "General Settings",
+      "content": [
+        {
+          "text": "General Settings",
+          "type": "section"
+        },
+        {
+          "id": "bPlayerOnly:General",
+          "text": "Player Only",
+          "type": "switcher",
+          "help": "Enable physics only for player character",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bNpcOnly:General",
+          "text": "NPC Only",
+          "type": "switcher",
+          "help": "Enable physics only for NPCs (not player)",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bDetectArmor:General",
+          "text": "Detect Armor",
+          "type": "switcher",
+          "help": "Automatically disable physics when armor is equipped",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bUseWhitelist:General",
+          "text": "Use Whitelist",
+          "type": "switcher",
+          "help": "Use race/gender whitelist system",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bFemaleOnly:General",
+          "text": "Female Only",
+          "type": "switcher",
+          "help": "Enable physics only for female characters",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bMaleOnly:General",
+          "text": "Male Only",
+          "type": "switcher",
+          "help": "Enable physics only for male characters",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "fPhysicDistanceEnable:General",
+          "text": "Physics Enable Distance",
+          "type": "slider",
+          "help": "Distance at which physics are enabled",
+          "valueOptions": {
+            "sourceType": "ModSettingFloat",
+            "min": 1000.0,
+            "max": 15000.0,
+            "step": 100.0
+          }
+        },
+        {
+          "id": "fPhysicDistanceDisable:General",
+          "text": "Physics Disable Distance",
+          "type": "slider",
+          "help": "Distance at which physics are disabled",
+          "valueOptions": {
+            "sourceType": "ModSettingFloat",
+            "min": 1000.0,
+            "max": 15000.0,
+            "step": 100.0
+          }
+        },
+        {
+          "id": "iMaxActiveActors:General",
+          "text": "Max Active Actors",
+          "type": "slider",
+          "help": "Maximum number of actors with active physics",
+          "valueOptions": {
+            "sourceType": "ModSettingInt",
+            "min": 1,
+            "max": 50,
+            "step": 1
+          }
+        }
+      ]
+    }
+  ]
+}
