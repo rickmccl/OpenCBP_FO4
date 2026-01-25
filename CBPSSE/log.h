@@ -13,6 +13,7 @@ public:
     ~CbpLogger();
     
     void SetLoggingEnabled(bool enabled);
+    void SetConsolidationEnabled(bool enabled);
     void Info(const char* fmt...);
     void Error(const char* fmt...);
 
@@ -22,6 +23,7 @@ private:
     FILE* handle;
     std::string lastMessage;
     bool loggingEnabled;
+    bool consolidationEnabled;
 };
 
 extern CbpLogger logger;

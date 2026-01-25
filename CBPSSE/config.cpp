@@ -19,7 +19,7 @@
 #define DEBUG 0
 #pragma warning(disable : 4996)
 
-int configReloadCount = 60;
+
 bool playerOnly = false;
 bool femaleOnly = false;
 bool maleOnly = false;
@@ -27,6 +27,7 @@ bool npcOnly = false;
 bool detectArmor = false;
 bool useWhitelist = false;
 bool loggingEnabled = true;
+bool logConsolidationEnabled = true;
 float physic_distance_enable = 7500.0f;
 float physic_distance_disable = 8500.0f;
 int max_active_actors = 10;
@@ -80,10 +81,16 @@ bool LoadConfig() {
         logger.Error("Found MCM settings, applying overrides\n");
     }
 
-    // Read logging setting first (affects subsequent log output)
+    // Read logging settings first (affects subsequent log output)
     loggingEnabled = configReader.GetBoolean("General", "loggingEnabled", true);
     logger.SetLoggingEnabled(loggingEnabled);
-    logger.Info("Logging: %s\n", loggingEnabled ? "enabled" : "disabled");
+    
+    logConsolidationEnabled = configReader.GetBoolean("General", "logConsolidationEnabled", true);
+    logger.SetConsolidationEnabled(logConsolidationEnabled);
+    
+    logger.Info("Logging: %s | Consolidation: %s\n", 
+                loggingEnabled ? "enabled" : "disabled",
+                logConsolidationEnabled ? "enabled" : "disabled");
 
     // Read general settings with MCM overrides
     if (hasMCM) {
@@ -188,9 +195,7 @@ bool LoadConfig() {
     logger.Info("Physics settings: enable=%.1f, disable=%.1f, max_actors=%d\n", 
                 physic_distance_enable, physic_distance_disable, max_active_actors);
     
-    configReloadCount = configReader.GetInteger("Tuning", "rate", 0);
-
-    //Read armorIgnore
+        //Read armorIgnore
     auto armorIgnoreStr = configReader.Get("General", "armorIgnore", "");
     {
         size_t commaPos;
@@ -335,7 +340,7 @@ bool LoadConfig() {
     boneNames.assign(bonesSet.begin(), bonesSet.end());
 
     // Check if physic_distance exists in INI, if not add it with default value
-    CheckAndAddMissingINIEntries();
+    // deprecating 20260125 RM // CheckAndAddMissingINIEntries();
     
     // Update file modification times after loading
     GetFileModificationTime("Data\\F4SE\\Plugins\\ocbp.ini", &lastMainINITime);
@@ -365,6 +370,8 @@ void DumpConfigToLog()
     }
 }
 
+/* Deprecating 20260125 RM - we have good defaults. writing the ini is player's job. */
+/*
 void CheckAndAddMissingINIEntries() {
     const char* iniPath = "Data\\F4SE\\Plugins\\ocbp.ini";
     
@@ -453,6 +460,8 @@ void CheckAndAddMissingINIEntries() {
         }
     }
 }
+*/  
+
 
 void DumpWhitelistToLog() {
     logger.Info("***** Whitelist Dump *****\n");

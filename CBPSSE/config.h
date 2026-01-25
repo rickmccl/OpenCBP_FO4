@@ -25,6 +25,7 @@ extern bool npcOnly;
 extern bool detectArmor;
 extern bool useWhitelist;
 extern bool loggingEnabled;
+extern bool logConsolidationEnabled;
 extern float physic_distance_enable;
 extern float physic_distance_disable;
 extern int max_active_actors;
@@ -32,7 +33,7 @@ extern int autoMode;
 extern int targetFPS;
 extern int autoExceptions;
 
-extern int configReloadCount;
+
 extern config_t config;
 extern config_t configArmor;
 extern whitelist_t whitelist;
@@ -43,7 +44,7 @@ extern FILETIME lastMainINITime;
 extern FILETIME lastMCMINITime;
 
 bool LoadConfig();
-void CheckAndAddMissingINIEntries();
+// deprecating 20260125 RM // void CheckAndAddMissingINIEntries();
 void DumpWhitelistToLog();
 bool GetFileModificationTime(const char* filepath, FILETIME* fileTime);
 bool CheckConfigFilesChanged();

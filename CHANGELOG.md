@@ -19,7 +19,8 @@
 - Revised logging system:  
   - Runtime toggle: `loggingEnabled=false` in the INI disables logging  
   - Deduplication: repeated messages are collapsed  
-  - Former “Error” messages now correctly labeled as `[Notice]`  
+  - Runtime toggle: `logConsolidationEnabled=false` in the INI will disable that.
+  - “Error” level messages are now labeled as `[Notice]`  
 
 ---
 
