@@ -1,28 +1,29 @@
----
 # 🛠️ OpenCBP_FO4 `3.4.191`
 
-### Game Version: `1.11.191`  
+### Game Version: `1.11.191`
 ### F4SE Version: `0.7.7`  
 
 ## Changes
 
 ### 🔧 Merge from Worthless99’s “FPS Fix with MCM Menu” (CBPSSE)
 - Mod Configuration Menu integration  
-- Physics optimizations: FPS fix
+- Physics optimizations: FPS fix  
 - Physics performance tuning: max actors, activation/deactivation distances  
 - Removal of AMP  
 - Logging improvements  
 - General code cleanups and modernization  
+- Really great for performance!
 
-### 🔨 Additional updates 
-- version resource created for dll
+### 🔨 Additional updates
+- Version resource created for DLL  
 - Revised logging system:  
   - Runtime toggle: `loggingEnabled=false` in the INI disables logging  
   - Deduplication: repeated messages are collapsed  
-  - Runtime toggle: `logConsolidationEnabled=false` in the INI will disable that.
+  - Runtime toggle: `logConsolidationEnabled=false` disables consolidation  
   - “Error” level messages are now labeled as `[Notice]`  
-
----
+- Config changes:  
+  - `tuning.rate` removed (no longer used)  
+  - Revised master `OCBP.ini` with documentation and valid parameters  
 
 Many thanks to Worthless99 for their work on  
 **OCBP and OCBPC FO4 – FPS Fix with MCM Menu**  
