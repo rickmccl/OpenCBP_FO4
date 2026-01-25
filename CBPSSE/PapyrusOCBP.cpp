@@ -1,5 +1,3 @@
-#pragma warning(disable : 5040)
-
 #include "PapyrusOCBP.h"
 
 //#include "f4se/PapyrusVM.h"
@@ -19,45 +17,82 @@
 
 #include "SimObj.h"
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+std::unordered_map<UInt32, std::unordered_map<std::string, bool>> boneIgnores;
 
 namespace papyrusOCBP
 {
-    concurrency::concurrent_unordered_map<UInt32, concurrency::concurrent_unordered_map<std::string, bool>> boneIgnores;
+	void SetBoneToggle(StaticFunctionTag*, Actor* actor, bool toggle, BSFixedString boneName)
+	{
+		boneIgnores[actor->formID][std::string(boneName.c_str())] = toggle;
+	}
 
-    void SetBoneToggle(StaticFunctionTag*, Actor* actor, bool toggle, BSFixedString boneName)
-    {
-        boneIgnores[actor->formID][std::string(boneName.c_str())] = toggle;
-    }
+	bool GetBoneToggle(StaticFunctionTag*, Actor* actor, BSFixedString boneName)
+	{
+		if (boneIgnores.find(actor->formID) != boneIgnores.end()) {
+			auto actorsBoneIgns = boneIgnores.at(actor->formID);
+			if (actorsBoneIgns.find(std::string(boneName.c_str())) != actorsBoneIgns.end()) {
+				return actorsBoneIgns.at(std::string(boneName.c_str()));
+			}
+		}
 
-    bool GetBoneToggle(StaticFunctionTag*, Actor* actor, BSFixedString boneName)
-    {
-        if (boneIgnores.find(actor->formID) != boneIgnores.end())
-        {
-            auto actorsBoneIgns = boneIgnores.at(actor->formID);
-            if (actorsBoneIgns.find(std::string(boneName.c_str())) != actorsBoneIgns.end())
-            {
-                return actorsBoneIgns.at(std::string(boneName.c_str()));
-            }
-        }
+		return false;
+	}
 
-        return false;
-    }
+	void ClearBoneToggles(StaticFunctionTag*)
+	{
+		boneIgnores.clear();
+	}
 
-    void ClearBoneToggles(StaticFunctionTag*)
-    {
-        boneIgnores.clear();
-    }
+	void CopyConfigToMCM(StaticFunctionTag*)
+	{
+		// Ścieżki do plików
+		std::string ocbpIniPath = "Data\\F4SE\\Plugins\\ocbp.ini";
+		std::string mcmSettingsPath = "Data\\MCM\\Config\\OCBP\\settings.ini";
+		
+		// Sprawdź czy istnieje źródłowy plik ocbp.ini
+		std::ifstream ocbpFile(ocbpIniPath);
+		if (!ocbpFile.is_open()) {
+			_MESSAGE("OCBP: Nie można otworzyć pliku ocbp.ini");
+			return;
+		}
+		
+		// Utwórz plik settings.ini
+		std::ofstream settingsFile(mcmSettingsPath);
+		if (!settingsFile.is_open()) {
+			_MESSAGE("OCBP: Nie można utworzyć pliku settings.ini");
+			ocbpFile.close();
+			return;
+		}
+		
+		// Skopiuj zawartość z ocbp.ini do settings.ini
+		std::string line;
+		while (std::getline(ocbpFile, line)) {
+			settingsFile << line << std::endl;
+		}
+		
+		ocbpFile.close();
+		settingsFile.close();
+		
+		_MESSAGE("OCBP: Konfiguracja skopiowana z ocbp.ini do MCM settings.ini");
+	}
 
 }
 
 void papyrusOCBP::RegisterFuncs(VirtualMachine* vm)
 {
-    vm->RegisterFunction(
-        new NativeFunction3<StaticFunctionTag, void, Actor*, bool, BSFixedString>("SetBoneToggle", "OCBP_API", papyrusOCBP::SetBoneToggle, vm));
+	vm->RegisterFunction(
+		new NativeFunction3<StaticFunctionTag, void, Actor*, bool, BSFixedString>("SetBoneToggle", "OCBP_API", papyrusOCBP::SetBoneToggle, vm));
 
-    vm->RegisterFunction(
-        new NativeFunction2<StaticFunctionTag, bool, Actor*, BSFixedString>("GetBoneToggle", "OCBP_API", papyrusOCBP::GetBoneToggle, vm));
+	vm->RegisterFunction(
+		new NativeFunction2<StaticFunctionTag, bool, Actor*, BSFixedString>("GetBoneToggle", "OCBP_API", papyrusOCBP::GetBoneToggle, vm));
 
-    vm->RegisterFunction(
-        new NativeFunction0<StaticFunctionTag, void>("ClearBoneToggles", "OCBP_API", papyrusOCBP::ClearBoneToggles, vm));
+	vm->RegisterFunction(
+		new NativeFunction0<StaticFunctionTag, void>("ClearBoneToggles", "OCBP_API", papyrusOCBP::ClearBoneToggles, vm));
+
+	vm->RegisterFunction(
+		new NativeFunction0<StaticFunctionTag, void>("CopyConfigToMCM", "OCBP_API", papyrusOCBP::CopyConfigToMCM, vm));
 }

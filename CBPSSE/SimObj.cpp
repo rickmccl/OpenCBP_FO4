@@ -1,5 +1,3 @@
-#pragma warning(disable : 5040)
-
 #include "f4se/NiNodes.h"
 #include "f4se/GameForms.h"
 #include "f4se/GameRTTI.h"
@@ -10,171 +8,114 @@
 #include "PapyrusOCBP.h"
 #include "SimObj.h"
 
-using actorUtils::GetBaseSkeleton;
 using actorUtils::IsBoneInWhitelist;
-using actorUtils::IsActorInPowerArmor;
-using papyrusOCBP::boneIgnores;
 
 // Note we don't ref count the nodes becasue it's ignored when the Actor is deleted, and calling Release after that can corrupt memory
 std::vector<std::string> boneNames;
 
-SimObj::SimObj(Actor* actor)
-    : things(4)
-{
+SimObj::SimObj(Actor *actor, config_t &config)
+    : things(4) {
     id = actor->formID;
-    gender = Gender::Unassigned;
-    raceEid = std::string("");
 }
 
-SimObj::~SimObj()
-{
+SimObj::~SimObj() {
 }
 
-bool SimObj::AddBonesToThings(Actor* actor, std::vector<std::string>& boneNames)
+
+bool SimObj::Bind(Actor *actor, std::vector<std::string>& boneNames, config_t &config)
 {
-    //logger.Error("%s\n", __func__);
-    if (!actor)
-    {
-        return false;
-    }
+//	logger.error("bind\n");
+
     auto loadedData = actor->unkF0;
-
-    if (loadedData && loadedData->rootNode)
-    {
-        for (std::string & b : boneNames)
-        {
-            if (!useWhitelist || (IsBoneInWhitelist(actor, b) && useWhitelist))
-            {
-                //logger.Error("%s: adding Bone %s for actor %08x\n", __func__, b.c_str(), actor->formID);
-                BSFixedString cs(b.c_str());
-                auto bone = loadedData->rootNode->GetObjectByName(&cs);
-                auto findBone = things.find(b);
-                if (!bone)
-                {
-                    logger.Info("%s: Failed to find Bone %s for actor %08x\n", __func__, b.c_str(), actor->formID);
-                }
-                else if (findBone == things.end())
-                {
-                    //logger.info("Doing Bone %s for actor %08x\n", b, actor->formID);
-                    things.insert(std::make_pair(b, Thing(bone, cs, actor)));
-                }
-            }
-        }
-    }
-    return true;
-}
-
-bool SimObj::Bind(Actor* actor, std::vector<std::string>& boneNames, config_t& config)
-{
-    if (!actor)
-    {
-        return false;
-    }
-    auto loadedData = actor->unkF0;
-    if (loadedData && loadedData->rootNode)
-    {
+    if (loadedData && loadedData->rootNode) {
         bound = true;
 
         things.clear();
-
-        if (actorUtils::IsActorMale(actor))
-        {
-            gender = Gender::Male;
+        for (std::string b : boneNames) {
+            const char* bone_c_str = b.c_str();
+            BSFixedString cs(bone_c_str);
+            auto bone = loadedData->rootNode->GetObjectByName(&cs);
+            if (!bone) {
+                logger.Info("Failed to find Bone %s for actor %08x\n", b.c_str(), actor->formID);
+            } else {
+                //logger.info("Doing Bone %s for actor %08x\n", b, actor->formID);
+                things.emplace(b, Thing(bone, cs));
+            }
         }
-        else
-        {
-            gender = Gender::Female;
-        }
-
-        raceEid = actorUtils::GetActorRaceEID(actor);
-
-        AddBonesToThings(actor, boneNames);
-        UpdateConfigs(config);
+        UpdateConfig(config);
         return  true;
     }
     return false;
 }
 
-UInt64 SimObj::GetActorKey()
-{
-    return currentActorKey;
+bool SimObj::ActorValid(Actor *actor) {
+    if (actor->flags & TESForm::kFlag_IsDeleted)
+        return false;
+    if (actor && actor->unkF0 && actor->unkF0->rootNode)
+        return true;
+    return false;
 }
 
-SimObj::Gender SimObj::GetGender()
-{
-    return gender;
-}
-
-std::string SimObj::GetRaceEID()
-{
-    return raceEid;
-}
-
-void SimObj::Reset()
-{
-    bound = false;
-    things.clear();
-}
-
-void SimObj::SetActorKey(UInt64 key)
-{
-    currentActorKey = key;
-}
-
-void SimObj::Update(Actor* actor)
-{
-    if (!bound ||
-        IsActorInPowerArmor(actor) ||
-        NULL == GetBaseSkeleton(actor))
-    {
+void SimObj::Update(Actor *actor) {
+    if (!bound)
         return;
+        
+    // Check distance from player with hysteresis to prevent stuttering
+    auto player = DYNAMIC_CAST(LookupFormByID(0x14), TESForm, Actor);
+    if (player && player->unkF0 && actor->formID != 0x14) { // Skip distance check for player themselves
+        NiPoint3 playerPos = player->unkF0->rootNode->m_worldTransform.pos;
+        NiPoint3 actorPos = actor->unkF0->rootNode->m_worldTransform.pos;
+        
+        float distanceSquared = (playerPos.x - actorPos.x) * (playerPos.x - actorPos.x) +
+                                (playerPos.y - actorPos.y) * (playerPos.y - actorPos.y) +
+                                (playerPos.z - actorPos.z) * (playerPos.z - actorPos.z);
+        
+        // Use hysteresis: different distances for enabling and disabling physics
+        float enableDistanceSquared = physic_distance_enable * physic_distance_enable;
+        float disableDistanceSquared = physic_distance_disable * physic_distance_disable;
+        
+        if (physicsActive) {
+            // Physics is currently active, check if we should disable it
+            if (distanceSquared > disableDistanceSquared) {
+                physicsActive = false;
+                return; // Skip physics processing
+            }
+        } else {
+            // Physics is currently inactive, check if we should enable it
+            if (distanceSquared > enableDistanceSquared) {
+                return; // Still too far, skip physics processing
+            } else {
+                physicsActive = true; // Enable physics
+            }
+        }
+    } else {
+        // Player or invalid state, keep physics active
+        physicsActive = true;
     }
+    
+    //logger.error("update\n");
+    for (auto &t : things) {
 
-    for (auto& t : things)
-    {
-        //concurrency::parallel_for_each(things.begin(), things.end(), [&](auto& thing)
-        //    {
         // Might be a better way to do this
-        auto actorBoneMapIter = boneIgnores.find(actor->formID);
-        if (actorBoneMapIter != boneIgnores.end())
-        {
-            auto & actorBoneMap = actorBoneMapIter->second;
-            auto boneDisabledIter = actorBoneMap.find(t.first);
-            if (boneDisabledIter != actorBoneMap.end())
-            {
-                if (true == boneDisabledIter->second)
-                {
+        if (boneIgnores.find(actor->formID) != boneIgnores.end()) {
+            auto actorBoneMap = boneIgnores.at(actor->formID);
+            if (actorBoneMap.find(t.first) != actorBoneMap.end()) {
+                if (actorBoneMap.at(t.first)) {
                     continue;
                 }
             }
         }
 
-        if (t.second.isEnabled)
-        {
-            t.second.UpdateThing(actor);
+        if (!useWhitelist || (IsBoneInWhitelist(actor, t.first) && useWhitelist)) {
+            t.second.Update(actor);
         }
-        //});
     }
+    //logger.error("end SimObj update\n");
 }
 
-bool SimObj::UpdateConfigs(config_t& config)
-{
-    for (auto & thing : things)
-    {
-        //concurrency::parallel_for_each(things.begin(), things.end(), [&](auto& thing)
-        //    {
-                //logger.Info("%s: Updating config for Thing %s\n", __func__, thing.first.c_str());
-
-        if (config.count(thing.first) > 0)
-        {
-            thing.second.UpdateConfig(config[thing.first]);
-            thing.second.isEnabled = true;
-        }
-        else
-        {
-            thing.second.isEnabled = false;
-        }
-        //});
+bool SimObj::UpdateConfig(config_t & config) {
+    for (auto &thing : things) {
+        thing.second.UpdateConfig(config[std::string(thing.first)]);
     }
     return true;
 }

@@ -169,6 +169,7 @@
     <ClInclude Include="ActorUtils.h" />
     <ClInclude Include="INIReader.h" />
     <ClInclude Include="PapyrusOCBP.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="SimObj.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="log.h" />
@@ -222,6 +223,9 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\detourxs-master\LDE64x64.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OpenCBP_FO4.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

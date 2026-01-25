@@ -23,7 +23,7 @@ F4SEPapyrusInterface* g_papyrus = nullptr;
 
 
 void DoHook();
-
+void ReloadActorConfig();
 
 
 void MessageHandler(F4SEMessagingInterface::Message* msg)
@@ -43,7 +43,9 @@ void MessageHandler(F4SEMessagingInterface::Message* msg)
     break;
     case F4SEMessagingInterface::kMessage_GameLoaded:
     {
-        logger.Info("kMessage_GameLoaded\n");
+        logger.Info("kMessage_GameLoaded - Reloading Config\n");
+        LoadConfig();
+        ReloadActorConfig();
     }
     break;
     case F4SEMessagingInterface::kMessage_NewGame:
@@ -102,7 +104,7 @@ extern "C"
     {
         F4SEPluginVersionData::kVersion,
 
-        28,
+        29,
         "OpenCBP",
         "0wizard",
 
