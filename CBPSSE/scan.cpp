@@ -183,13 +183,10 @@ void UpdateActors() {
                 // Attempt to get actors
                 auto actor = DYNAMIC_CAST(ref, TESObjectREFR, Actor);
                 if (actor && actor->unkF0) {
+                    logger.Info("SCAN: Found actor %08x", actor->formID);
                     // Find if actors is already being tracked
                     auto soIt = actors.find(actor->formID);
                     if (soIt == actors.end() && IsActorTrackable(actor)) {
-                        logger.Info("Tracking Actor with form ID %08x in cell %ld, race is %s, gender is %d\n", 
-                            actor->formID, actor->parentCell,
-                            actor->race->editorId.c_str(),
-                            IsActorMale(actor));
                         // Calculate distance from player
                         float distance = 0.0f;
                         if (player && actor) {
@@ -200,7 +197,11 @@ void UpdateActors() {
                             float dz = pPos.z - aPos.z;
                             distance = sqrt(dx*dx + dy*dy + dz*dz);
                         }
-                        
+                        logger.Info("SCAN: Tracking Actor %08x, race %s, gender %d, distance %f.2\n",
+                            actor->formID, actor->race->editorId.c_str(),
+                            IsActorMale(actor) ? "M" : "F",
+                            distance);
+
                         // Make SimObj and place new element in Things
                         auto obj = SimObj(actor, config);
                         if (obj.ActorValid(actor)) {

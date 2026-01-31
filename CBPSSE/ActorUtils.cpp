@@ -26,7 +26,7 @@ bool actorUtils::IsActorMale(Actor *actor)
 bool actorUtils::IsActorInPowerArmor(Actor* actor) {
     if (!actor)
         return false;
-    return !actor->extraDataList->HasType(kExtraData_PowerArmor);
+	return actor->extraDataList->HasType(kExtraData_PowerArmor);  // removed negation instead of rename function RM 1/30/26
 }
 
 
@@ -60,7 +60,7 @@ bool actorUtils::IsActorTorsoArmorEquipped(Actor* actor)
     return true;
 }
 
-
+/*
 bool actorUtils::IsActorTrackable(Actor* actor) {
     bool inRaceWhitelist = find(raceWhitelist.begin(), raceWhitelist.end(), actorUtils::GetActorRaceEID(actor)) != raceWhitelist.end();
     return IsActorInPowerArmor(actor) &&
@@ -70,6 +70,43 @@ bool actorUtils::IsActorTrackable(Actor* actor) {
             (!npcOnly || (actor->formID != 0x14 && npcOnly)) &&
             (!useWhitelist || (inRaceWhitelist && useWhitelist));
 }
+*/
+
+bool actorUtils::IsActorTrackable(Actor* actor) 
+// Selects actors for processing based on INI file parameters.
+{
+    if (!actor)
+        return false;
+
+    // 1. Special exclusion: Power Armor
+    if (IsActorInPowerArmor(actor))
+        return false;
+
+    // 2. Player/NPC filtering
+    bool isPlayer = (actor->formID == 0x14);
+    if (playerOnly && !isPlayer)
+        return false;
+    if (npcOnly && isPlayer)
+        return false;
+
+    // 3. Gender filtering
+    bool isMale = IsActorMale(actor);
+    if (maleOnly && !isMale)
+        return false;
+    if (femaleOnly && isMale)
+        return false;
+
+    // 4. Race whitelist
+    if (useWhitelist) {
+        std::string race = GetActorRaceEID(actor);
+        bool inList = std::find(raceWhitelist.begin(), raceWhitelist.end(), race) != raceWhitelist.end();
+        if (!inList)
+            return false;
+    }
+
+    return true;   // only the ham remains
+}
+
 
 bool actorUtils::IsBoneInWhitelist(Actor* actor, std::string boneName) {
     auto raceEID = actorUtils::GetActorRaceEID(actor);
