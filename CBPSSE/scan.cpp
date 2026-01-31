@@ -183,7 +183,7 @@ void UpdateActors() {
                 // Attempt to get actors
                 auto actor = DYNAMIC_CAST(ref, TESObjectREFR, Actor);
                 if (actor && actor->unkF0) {
-                    logger.Info("SCAN: Found actor %08x", actor->formID);
+                    // spammy // logger.Info("SCAN: Found actor %08x\n", actor->formID);
                     // Find if actors is already being tracked
                     auto soIt = actors.find(actor->formID);
                     if (soIt == actors.end() && IsActorTrackable(actor)) {
@@ -197,7 +197,7 @@ void UpdateActors() {
                             float dz = pPos.z - aPos.z;
                             distance = sqrt(dx*dx + dy*dy + dz*dz);
                         }
-                        logger.Info("SCAN: Tracking Actor %08x, race %s, gender %d, distance %f.2\n",
+                        logger.Info("SCAN: Tracking Actor %08x, race %s, gender %s, distance %f.2\n",
                             actor->formID, actor->race->editorId.c_str(),
                             IsActorMale(actor) ? "M" : "F",
                             distance);
