@@ -110,6 +110,7 @@ inline void safe_delete(T*& in) {
 
 std::unordered_map<UInt32, SimObj> actors;
 TESObjectCELL *curCell = nullptr;
+std::unordered_set<UInt32> debonedActors;
 
 void ReloadActorConfig() {
     logger.Info("Reloading config for %d actors\n", actors.size());
@@ -156,6 +157,10 @@ void UpdateActors() {
     } else {
         dynamicMaxActors = max_active_actors;
     }
+    // Ensure dynamicMaxActors never exceeds configured cap (e.g., after player changes it with MCM)
+    if (dynamicMaxActors > max_active_actors) {
+        dynamicMaxActors = max_active_actors;
+    }
 
     // We scan the cell and build the list every time - only look up things by ID once
     // we retain all state by actor ID, in a map - it's cleared on cell change
@@ -163,7 +168,7 @@ void UpdateActors() {
     std::vector<ActorEntry> exceptionActors;
     std::vector<ActorEntry> normalActors;
 
-    //logger.error("scan Cell\n");
+    //logger.error("scan Cell\n"); //spammy
     auto player = DYNAMIC_CAST(LookupFormByID(0x14), TESForm, Actor);
     if (!player || !player->unkF0) goto FAILED;
 
@@ -187,16 +192,18 @@ void UpdateActors() {
                     // Find if actors is already being tracked
                     auto soIt = actors.find(actor->formID);
                     if (soIt == actors.end() && IsActorTrackable(actor)) {
-                        // Calculate distance from player
-                        float distance = 0.0f;
-                        if (player && actor) {
-                            auto pPos = player->pos;
-                            auto aPos = actor->pos;
-                            float dx = pPos.x - aPos.x;
-                            float dy = pPos.y - aPos.y;
-                            float dz = pPos.z - aPos.z;
-                            distance = sqrt(dx*dx + dy*dy + dz*dz);
-                        }
+                        // bone presence check moved into IsActorTrackable (and cached in debonedActors).
+                        // Keep scan loop lean — IsActorTrackable now returns false for deboned actors.
+                         // Calculate distance from player
+                         float distance = 0.0f;
+                         if (player && actor) {
+                             auto pPos = player->pos;
+                             auto aPos = actor->pos;
+                             float dx = pPos.x - aPos.x;
+                             float dy = pPos.y - aPos.y;
+                             float dz = pPos.z - aPos.z;
+                             distance = sqrt(dx*dx + dy*dy + dz*dz);
+                         }
                         logger.Info("SCAN: Tracking Actor %08x, race %s, gender %s, distance %f.2\n",
                             actor->formID, actor->race->editorId.c_str(),
                             IsActorMale(actor) ? "M" : "F",

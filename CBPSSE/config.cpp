@@ -26,6 +26,7 @@ bool maleOnly = false;
 bool npcOnly = false;
 bool detectArmor = false;
 bool useWhitelist = false;
+bool autoWhitelist = false;
 bool loggingEnabled = true;
 bool logConsolidationEnabled = true;
 float physic_distance_enable = 7500.0f;
@@ -98,6 +99,7 @@ bool LoadConfig() {
     bool cfg_femaleOnly = configReader.GetBoolean("General", "femaleOnly", false);
     bool cfg_maleOnly = configReader.GetBoolean("General", "maleOnly", false);
     bool cfg_useWhitelist = configReader.GetBoolean("General", "useWhitelist", false);
+    bool cfg_autoWhitelist = configReader.GetBoolean("General", "autoWhitelist", false);
     bool cfg_detectArmor = configReader.GetBoolean("General", "detectArmor", false);
 
     float cfg_physic_distance_enable = configReader.GetFloat("General", "physic_distance_enable", 7500.0f);
@@ -165,6 +167,15 @@ bool LoadConfig() {
     logger.Info("CONFIG: useWhitelist=%s (source: %s)\n",
                 useWhitelist ? "true" : "false",
                 mcmHasKey("bUseWhitelist") ? "MCM" : "INI");
+
+    if (mcmHasKey("bautoWhitelist")) {
+        autoWhitelist = mcmReader.GetBoolean("General", "bautoWhitelist", cfg_autoWhitelist);
+    } else {
+        autoWhitelist = cfg_autoWhitelist;
+    }
+    logger.Info("CONFIG: autoWhitelist=%s (source: %s)\n",
+                autoWhitelist ? "true" : "false",
+                mcmHasKey("autoWhitelist") ? "MCM" : "INI");
 
     if (mcmHasKey("bDetectArmor")) {
         detectArmor = mcmReader.GetBoolean("General", "bDetectArmor", cfg_detectArmor);

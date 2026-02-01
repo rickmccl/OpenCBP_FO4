@@ -2,10 +2,12 @@
 
 #include "ActorUtils.h"
 #include "log.h"
+#include "SimObj.h" // for boneNames & debonedActors
 
 #include "f4se/GameExtraData.h"
 #include "f4se/GameObjects.h"
 #include "f4se/GameRTTI.h"
+#include "f4se/NiNodes.h" // for NiNode and GetObjectByName
 
 std::string actorUtils::GetActorRaceEID(Actor* actor) {
     return std::string(actor->race->editorId.c_str());
@@ -104,20 +106,58 @@ bool actorUtils::IsActorTrackable(Actor* actor)
             return false;
     }
 
-    return true;   // only the ham remains
-}
+    // 5. Optional autowhitelist: exclude actors that do not contain any configured bones.
+    //    Use a cache (debonedActors) so we only probe each actor once per session/cell.
+    if (autoWhitelist) {
+        // If already known to be deboned, skip immediately
+        if (debonedActors.find(actor->formID) != debonedActors.end())
+            return false;
 
+        // If no bones configured, treat as "no filter" => accept actor
+        if (!boneNames.empty()) {
+            auto loadedState = actor->unkF0;
+            if (!loadedState || !loadedState->rootNode) {
+                // Not loaded enough to check bones — don't track now
+                return false;
+            }
 
-bool actorUtils::IsBoneInWhitelist(Actor* actor, std::string boneName) {
-    auto raceEID = actorUtils::GetActorRaceEID(actor);
-    if (whitelist.find(boneName) != whitelist.end()) {
-        auto racesMap = whitelist.at(boneName);
-        if (racesMap.find(raceEID) != racesMap.end()) {
-            if (IsActorMale(actor))
-                return racesMap.at(raceEID).male;
-            else
-                return racesMap.at(raceEID).female;
+            bool hasAnyBone = false;
+            auto root = loadedState->rootNode;
+            for (const auto &b : boneNames) {
+                if (b.empty()) continue;
+                BSFixedString cs(b.c_str());
+                if (root->GetObjectByName(&cs)) {
+                    hasAnyBone = true;
+                    break;
+                }
+            }
+            if (!hasAnyBone) {
+                // remember this actor as deboned so we don't probe again until config reload / cell change
+                debonedActors.insert(actor->formID);
+                logger.Info("autowhitelist: marking actor %08x as deboned (no configured bones)\n", actor->formID);
+                return false;
+            }
         }
     }
-    return false;
+
+    return true;   // passed all filters
+}
+
+bool actorUtils::IsBoneInWhitelist(Actor* actor, std::string boneName) {
+    if (!actor)
+        return false;
+
+    auto raceEID = actorUtils::GetActorRaceEID(actor);
+
+    auto wbIt = whitelist.find(boneName);
+    if (wbIt == whitelist.end())
+        return false;
+
+    const auto& racesMap = wbIt->second;
+    auto rmIt = racesMap.find(raceEID);
+    if (rmIt == racesMap.end())
+        return false;
+
+    const whitelistSex &sexFlags = rmIt->second;
+    return IsActorMale(actor) ? sexFlags.male : sexFlags.female;
 }

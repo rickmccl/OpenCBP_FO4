@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <unordered_set>
 #include "f4se/GameReferences.h"
 #include "Thing.h"
 #include "config.h"
@@ -26,3 +27,4 @@ public:
 };
 
 extern std::vector<std::string> boneNames;
+extern std::unordered_set<UInt32> debonedActors;

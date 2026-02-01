@@ -26,6 +26,7 @@ extern bool detectArmor;
 extern bool useWhitelist;
 extern bool loggingEnabled;
 extern bool logConsolidationEnabled;
+extern bool autoWhitelist;
 extern float physic_distance_enable;
 extern float physic_distance_disable;
 extern int max_active_actors;
