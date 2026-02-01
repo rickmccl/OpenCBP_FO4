@@ -49,7 +49,7 @@ std::vector<std::string> raceWhitelist;
 std::unordered_map<UInt32, bool> armorIgnore;
 
 bool LoadConfig() {
-    logger.Info("loadConfig\n");
+    logger.Info("CONFIG: Load config\n");
 
     std::set<std::string> bonesSet;
 
@@ -70,97 +70,165 @@ bool LoadConfig() {
     // Note: Using INIReader results in a slight double read
     INIReader configReader("Data\\F4SE\\Plugins\\ocbp.ini");
     if (configReader.ParseError() < 0) {
-        logger.Error("Can't load 'ocbp.ini'\n");
+        logger.Error("CONFIG: Can't load 'ocbp.ini'\n");
     }
-    logger.Error("Reading CBP Config\n");
+    logger.Error("CONFIG: Reading CBP Config\n");
 
     // Check for MCM override settings
     INIReader mcmReader("Data\\MCM\\Settings\\OCBP.ini");
     bool hasMCM = (mcmReader.ParseError() >= 0);
     if (hasMCM) {
-        logger.Error("Found MCM settings, applying overrides\n");
+        logger.Error("CONFIG: Found MCM settings, applying overrides\n");
     }
 
     // Read logging settings first (affects subsequent log output)
     loggingEnabled = configReader.GetBoolean("General", "loggingEnabled", true);
     logger.SetLoggingEnabled(loggingEnabled);
-    
+
     logConsolidationEnabled = configReader.GetBoolean("General", "logConsolidationEnabled", true);
     logger.SetConsolidationEnabled(logConsolidationEnabled);
-    
-    logger.Info("Logging: %s | Consolidation: %s\n", 
+
+    logger.Info("CONFIG: Logging: %s | Consolidation: %s\n",
                 loggingEnabled ? "enabled" : "disabled",
                 logConsolidationEnabled ? "enabled" : "disabled");
 
-    // Read general settings with MCM overrides
-    if (hasMCM) {
-        int actorFilter = mcmReader.GetInteger("General", "iActorFilter", -1);
-        int genderFilter = mcmReader.GetInteger("General", "iGenderFilter", -1);
-        
-        if (actorFilter >= 0) {
-            switch (actorFilter) {
-                case 0:
-                    playerOnly = false;
-                    npcOnly = false;
-                    break;
-                case 1:
-                    playerOnly = true;
-                    npcOnly = false;
-                    break;
-                case 2:
-                    playerOnly = false;
-                    npcOnly = true;
-                    break;
-                default:
-                    playerOnly = configReader.GetBoolean("General", "playerOnly", false);
-                    npcOnly = configReader.GetBoolean("General", "npcOnly", false);
-                    break;
-            }
-        } else {
-            playerOnly = configReader.GetBoolean("General", "playerOnly", false);
-            npcOnly = configReader.GetBoolean("General", "npcOnly", false);
+    // Read defaults from config (INI)
+    bool cfg_playerOnly = configReader.GetBoolean("General", "playerOnly", false);
+    bool cfg_npcOnly = configReader.GetBoolean("General", "npcOnly", false);
+    bool cfg_femaleOnly = configReader.GetBoolean("General", "femaleOnly", false);
+    bool cfg_maleOnly = configReader.GetBoolean("General", "maleOnly", false);
+    bool cfg_useWhitelist = configReader.GetBoolean("General", "useWhitelist", false);
+    bool cfg_detectArmor = configReader.GetBoolean("General", "detectArmor", false);
+
+    float cfg_physic_distance_enable = configReader.GetFloat("General", "physic_distance_enable", 7500.0f);
+    float cfg_physic_distance_disable = configReader.GetFloat("General", "physic_distance_disable", 8500.0f);
+    int   cfg_max_active_actors = configReader.GetInteger("General", "max_active_actors", 10);
+
+    int cfg_autoMode = configReader.GetInteger("General", "autoMode", 0);
+    int cfg_targetFPS = configReader.GetInteger("General", "targetFPS", 60);
+    int cfg_autoExceptions = configReader.GetInteger("General", "autoExceptions", 1);
+
+    // Determine if MCM provided a [General] section and helper to test for key presence
+    bool mcmHasGeneral = hasMCM && (mcmReader.Sections().count("General") > 0);
+
+    auto mcmHasKey = [&](const char* key) -> bool {
+        if (!mcmHasGeneral) return false;
+        try {
+            return mcmReader.Section("General").count(key) > 0;
+        } catch (...) {
+            return false;
         }
-        
-        if (genderFilter >= 0) {
-            switch (genderFilter) {
-                case 0:
-                    femaleOnly = false;
-                    maleOnly = false;
-                    useWhitelist = false;
-                    break;
-                case 1:
-                    femaleOnly = true;
-                    maleOnly = false;
-                    useWhitelist = false;
-                    break;
-                case 2:
-                    femaleOnly = false;
-                    maleOnly = true;
-                    useWhitelist = false;
-                    break;
-                case 3:
-                    femaleOnly = false;
-                    maleOnly = false;
-                    useWhitelist = true;
-                    break;
-                default:
-                    femaleOnly = configReader.GetBoolean("General", "femaleOnly", false);
-                    maleOnly = configReader.GetBoolean("General", "maleOnly", false);
-                    useWhitelist = configReader.GetBoolean("General", "useWhitelist", false);
-                    break;
-            }
-        } else {
-            femaleOnly = configReader.GetBoolean("General", "femaleOnly", false);
-            maleOnly = configReader.GetBoolean("General", "maleOnly", false);
-            useWhitelist = configReader.GetBoolean("General", "useWhitelist", false);
-        }
+    };
+
+    // Apply per-key precedence: INI defaults first, then MCM only if the key exists there
+    if (mcmHasKey("bPlayerOnly")) {
+        playerOnly = mcmReader.GetBoolean("General", "bPlayerOnly", cfg_playerOnly);
     } else {
-        playerOnly = configReader.GetBoolean("General", "playerOnly", false);
-        npcOnly = configReader.GetBoolean("General", "npcOnly", false);
-        femaleOnly = configReader.GetBoolean("General", "femaleOnly", false);
-        maleOnly = configReader.GetBoolean("General", "maleOnly", false);
-        useWhitelist = configReader.GetBoolean("General", "useWhitelist", false);
+        playerOnly = cfg_playerOnly;
     }
+    logger.Info("CONFIG: playerOnly=%s (source: %s)\n",
+                playerOnly ? "true" : "false",
+                mcmHasKey("bPlayerOnly") ? "MCM" : "INI");
+
+    if (mcmHasKey("bNpcOnly")) {
+        npcOnly = mcmReader.GetBoolean("General", "bNpcOnly", cfg_npcOnly);
+    } else {
+        npcOnly = cfg_npcOnly;
+    }
+    logger.Info("CONFIG: npcOnly=%s (source: %s)\n",
+                npcOnly ? "true" : "false",
+                mcmHasKey("bNpcOnly") ? "MCM" : "INI");
+
+    if (mcmHasKey("bFemaleOnly")) {
+        femaleOnly = mcmReader.GetBoolean("General", "bFemaleOnly", cfg_femaleOnly);
+    } else {
+        femaleOnly = cfg_femaleOnly;
+    }
+    logger.Info("CONFIG: femaleOnly=%s (source: %s)\n",
+                femaleOnly ? "true" : "false",
+                mcmHasKey("bFemaleOnly") ? "MCM" : "INI");
+
+    if (mcmHasKey("bMaleOnly")) {
+        maleOnly = mcmReader.GetBoolean("General", "bMaleOnly", cfg_maleOnly);
+    } else {
+        maleOnly = cfg_maleOnly;
+    }
+    logger.Info("CONFIG: maleOnly=%s (source: %s)\n",
+                maleOnly ? "true" : "false",
+                mcmHasKey("bMaleOnly") ? "MCM" : "INI");
+
+    if (mcmHasKey("bUseWhitelist")) {
+        useWhitelist = mcmReader.GetBoolean("General", "bUseWhitelist", cfg_useWhitelist);
+    } else {
+        useWhitelist = cfg_useWhitelist;
+    }
+    logger.Info("CONFIG: useWhitelist=%s (source: %s)\n",
+                useWhitelist ? "true" : "false",
+                mcmHasKey("bUseWhitelist") ? "MCM" : "INI");
+
+    if (mcmHasKey("bDetectArmor")) {
+        detectArmor = mcmReader.GetBoolean("General", "bDetectArmor", cfg_detectArmor);
+    } else {
+        detectArmor = cfg_detectArmor;
+    }
+    logger.Info("CONFIG: detectArmor=%s (source: %s)\n",
+                detectArmor ? "true" : "false",
+                mcmHasKey("bDetectArmor") ? "MCM" : "INI");
+
+    if (mcmHasKey("fPhysicDistanceEnable")) {
+        physic_distance_enable = mcmReader.GetFloat("General", "fPhysicDistanceEnable", cfg_physic_distance_enable);
+    } else {
+        physic_distance_enable = cfg_physic_distance_enable;
+    }
+    logger.Info("CONFIG: physic_distance_enable=%.1f (source: %s)\n",
+                physic_distance_enable,
+                mcmHasKey("fPhysicDistanceEnable") ? "MCM" : "INI");
+
+    if (mcmHasKey("fPhysicDistanceDisable")) {
+        physic_distance_disable = mcmReader.GetFloat("General", "fPhysicDistanceDisable", cfg_physic_distance_disable);
+    } else {
+        physic_distance_disable = cfg_physic_distance_disable;
+    }
+    logger.Info("CONFIG: physic_distance_disable=%.1f (source: %s)\n",
+                physic_distance_disable,
+                mcmHasKey("fPhysicDistanceDisable") ? "MCM" : "INI");
+
+    if (mcmHasKey("iMaxActiveActors")) {
+        max_active_actors = (int)mcmReader.GetInteger("General", "iMaxActiveActors", cfg_max_active_actors);
+    } else {
+        max_active_actors = cfg_max_active_actors;
+    }
+    logger.Info("CONFIG: max_active_actors=%d (source: %s)\n",
+                max_active_actors,
+                mcmHasKey("iMaxActiveActors") ? "MCM" : "INI");
+
+    // numeric fallbacks (only override when MCM key exists)
+    if (mcmHasKey("iAutoMode")) {
+        autoMode = (int)mcmReader.GetInteger("General", "iAutoMode", cfg_autoMode);
+    } else {
+        autoMode = cfg_autoMode;
+    }
+    logger.Info("CONFIG: autoMode=%d (source: %s)\n",
+                autoMode,
+                mcmHasKey("iAutoMode") ? "MCM" : "INI");
+
+    if (mcmHasKey("iTargetFPS")) {
+        targetFPS = (int)mcmReader.GetInteger("General", "iTargetFPS", cfg_targetFPS);
+    } else {
+        targetFPS = cfg_targetFPS;
+    }
+    logger.Info("CONFIG: targetFPS=%d (source: %s)\n",
+                targetFPS,
+                mcmHasKey("iTargetFPS") ? "MCM" : "INI");
+
+    if (mcmHasKey("iAutoExceptions")) {
+        autoExceptions = (int)mcmReader.GetInteger("General", "iAutoExceptions", cfg_autoExceptions);
+    } else {
+        autoExceptions = cfg_autoExceptions;
+    }
+    logger.Info("CONFIG: autoExceptions=%d (source: %s)\n",
+                autoExceptions,
+                mcmHasKey("iAutoExceptions") ? "MCM" : "INI");
 
     reloadActors = (playerOnly ^ playerOnlyOld) ||
                     (femaleOnly ^ femaleOnlyOld) ||
@@ -168,34 +236,34 @@ bool LoadConfig() {
                     (npcOnly ^ npcOnlyOld) ||
                     (useWhitelist ^ useWhitelistOld);
 
-    detectArmor = hasMCM ? mcmReader.GetBoolean("General", "bDetectArmor", configReader.GetBoolean("General", "detectArmor", false)) : configReader.GetBoolean("General", "detectArmor", false);
-    physic_distance_enable = hasMCM ? mcmReader.GetFloat("General", "fPhysicDistanceEnable", configReader.GetFloat("General", "physic_distance_enable", 7500.0f)) : configReader.GetFloat("General", "physic_distance_enable", 7500.0f);
-    physic_distance_disable = hasMCM ? mcmReader.GetFloat("General", "fPhysicDistanceDisable", configReader.GetFloat("General", "physic_distance_disable", 8500.0f)) : configReader.GetFloat("General", "physic_distance_disable", 8500.0f);
-    max_active_actors = hasMCM ? mcmReader.GetInteger("General", "iMaxActiveActors", configReader.GetInteger("General", "max_active_actors", 10)) : configReader.GetInteger("General", "max_active_actors", 10);
-    autoMode = hasMCM ? mcmReader.GetInteger("General", "iAutoMode", 0) : 0;
-    targetFPS = hasMCM ? mcmReader.GetInteger("General", "iTargetFPS", 60) : 60;
-    autoExceptions = hasMCM ? mcmReader.GetInteger("General", "iAutoExceptions", 1) : 1;
-    
+    logger.Info("CONFIG: Reloadactors %s, playerOnly %s, NPCOnly %s, femaleOnly %s, maleOnly %s, useWhiteList %s\n",
+        reloadActors ? "true" : "false",
+        playerOnly ? "true" : "false",
+        npcOnly ? "true" : "false",
+        femaleOnly ? "true" : "false",
+        maleOnly ? "true" : "false",
+        useWhitelist ? "true" : "false");
+
     // Validate distance settings
     if (physic_distance_disable <= physic_distance_enable) {
-        logger.Error("WARNING: physic_distance_disable (%f) must be greater than physic_distance_enable (%f)\n", 
+        logger.Error("CONFIG WARNING: physic_distance_disable (%f) must be greater than physic_distance_enable (%f)\n",
                      physic_distance_disable, physic_distance_enable);
-        logger.Error("Auto-correcting: setting physic_distance_disable to %f\n", physic_distance_enable + 1000.0f);
+        logger.Error("CONFIG: Auto-correcting: setting physic_distance_disable to %f\n", physic_distance_enable + 1000.0f);
         physic_distance_disable = physic_distance_enable + 1000.0f;
     }
-    
+
     // Validate max actors setting
     if (max_active_actors < 1) {
-        logger.Error("WARNING: max_active_actors (%d) must be at least 1. Setting to 1\n", max_active_actors);
+        logger.Error("CONFIG WARNING: max_active_actors (%d) must be at least 1. Setting to 1\n", max_active_actors);
         max_active_actors = 1;
     } else if (max_active_actors > 50) {
-        logger.Error("WARNING: max_active_actors (%d) is very high! This may cause performance issues\n", max_active_actors);
+        logger.Error("CONFIG WARNING: max_active_actors (%d) is very high! This may cause performance issues\n", max_active_actors);
     }
-    
-    logger.Info("Physics settings: enable=%.1f, disable=%.1f, max_actors=%d\n", 
+
+    logger.Info("CONFIG: Physics settings: enable=%.1f, disable=%.1f, max_actors=%d\n",
                 physic_distance_enable, physic_distance_disable, max_active_actors);
-    
-        //Read armorIgnore
+
+    //Read armorIgnore
     auto armorIgnoreStr = configReader.Get("General", "armorIgnore", "");
     {
         size_t commaPos;
@@ -346,129 +414,36 @@ bool LoadConfig() {
     GetFileModificationTime("Data\\F4SE\\Plugins\\ocbp.ini", &lastMainINITime);
     GetFileModificationTime("Data\\MCM\\Settings\\OCBP.ini", &lastMCMINITime);
     
-    logger.Error("Finished CBP Config\n");
+    logger.Error("CONFIG: Finished CBP Config\n");
     return reloadActors;
 }
 
 void DumpConfigToLog()
 {
     // Log contents of config
-    logger.Info("***** Config Dump *****\n");
+    logger.Info("CONFIG: ***** Config Dump *****\n");
     for (auto section : config) {
-        logger.Info("[%s]\n", section.first.c_str());
+        logger.Info("CONFIG: [%s]\n", section.first.c_str());
         for (auto setting : section.second) {
-            logger.Info("%s=%f\n", setting.first.c_str(), setting.second);
+            logger.Info("CONFIG: %s=%f\n", setting.first.c_str(), setting.second);
         }
     }
 
-    logger.Info("***** ConfigArmor Dump *****\n");
+    logger.Info("CONFIG: ***** ConfigArmor Dump *****\n");
     for (auto section : configArmor) {
-        logger.Info("[%s]\n", section.first.c_str());
+        logger.Info("CONFIG: [%s]\n", section.first.c_str());
         for (auto setting : section.second) {
-            logger.Info("%s=%f\n", setting.first.c_str(), setting.second);
+            logger.Info("CONFIG: %s=%f\n", setting.first.c_str(), setting.second);
         }
     }
 }
-
-/* Deprecating 20260125 RM - we have good defaults. writing the ini is player's job. */
-/*
-void CheckAndAddMissingINIEntries() {
-    const char* iniPath = "Data\\F4SE\\Plugins\\ocbp.ini";
-    
-    // Read current INI to check if physic_distance exists
-    INIReader reader(iniPath);
-    if (reader.ParseError() < 0) {
-        logger.Error("Can't check INI for missing entries\n");
-        return;
-    }
-    
-    // Check if physic distance entries exist in [General] section
-    auto physicDistanceEnableStr = reader.Get("General", "physic_distance_enable", "");
-    auto physicDistanceDisableStr = reader.Get("General", "physic_distance_disable", "");
-    auto maxActiveActorsStr = reader.Get("General", "max_active_actors", "");
-    
-    std::string missingEntries = "";
-    
-    // Check if comments header already exists in the file
-    std::ifstream file(iniPath);
-    std::string line;
-    bool hasPhysicsHeader = false;
-    if (file.is_open()) {
-        while (std::getline(file, line)) {
-            if (line.find("===== PHYSICS DISTANCE SETTINGS =====") != std::string::npos) {
-                hasPhysicsHeader = true;
-                break;
-            }
-        }
-        file.close();
-    }
-    
-    // Add explanatory header if any entries are missing AND header doesn't exist
-    bool needsEntries = physicDistanceEnableStr.empty() || physicDistanceDisableStr.empty() || maxActiveActorsStr.empty();
-    bool needsHeader = needsEntries && !hasPhysicsHeader;
-    
-    if (needsHeader) {
-        missingEntries += "\n; ===== PHYSICS DISTANCE SETTINGS =====";
-        missingEntries += "\n; Controls when CBP physics are active based on distance from player";
-        missingEntries += "\n; Smaller values = better performance, larger values = physics work farther away";
-    }
-    
-    if (physicDistanceEnableStr.empty()) {
-        missingEntries += "\n; Distance at which physics STARTS working (NPCs closer than this = physics ON)";
-        missingEntries += "\nphysic_distance_enable=7500.0";
-    }
-    if (physicDistanceDisableStr.empty()) {
-        missingEntries += "\n; Distance at which physics STOPS working (NPCs farther than this = physics OFF)";
-        missingEntries += "\n; MUST be greater than physic_distance_enable to prevent performance issues!";
-        missingEntries += "\nphysic_distance_disable=8500.0";
-    }
-    if (maxActiveActorsStr.empty()) {
-        missingEntries += "\n; Maximum number of NPCs that can have active physics at the same time";
-        missingEntries += "\n; Lower values = better performance in crowded areas (Diamond City etc.)";
-        missingEntries += "\nmax_active_actors=10";
-    }
-    
-    if (!missingEntries.empty()) {
-        // Some entries don't exist, add them
-        logger.Info("Adding missing physics distance entries to INI\n");
-        
-        // Read entire INI file
-        std::ifstream iniFile(iniPath);
-        std::string content((std::istreambuf_iterator<char>(iniFile)), std::istreambuf_iterator<char>());
-        iniFile.close();
-        
-        // Find [General] section and add missing entries
-        size_t generalPos = content.find("[General]");
-        if (generalPos != std::string::npos) {
-            // Find next section or end of file
-            size_t nextSectionPos = content.find("\n[", generalPos + 9);
-            if (nextSectionPos == std::string::npos) {
-                nextSectionPos = content.length();
-            }
-            
-            // Insert missing entries before next section
-            content.insert(nextSectionPos, missingEntries);
-            
-            // Write back to file
-            std::ofstream outFile(iniPath);
-            outFile << content;
-            outFile.close();
-            
-            logger.Info("Successfully added physics distance entries to [General] section\n");
-        } else {
-            logger.Error("Could not find [General] section in INI file\n");
-        }
-    }
-}
-*/  
-
 
 void DumpWhitelistToLog() {
-    logger.Info("***** Whitelist Dump *****\n");
+    logger.Info("CONFIG: ***** Whitelist Dump *****\n");
     for (auto section : whitelist) {
-        logger.Info("[%s]\n", section.first.c_str());
+        logger.Info("CONFIG: [%s]\n", section.first.c_str());
         for (auto setting : section.second) {
-            logger.Info("%s= female: %d, male: %d\n", setting.first.c_str(), setting.second.female, setting.second.male);
+            logger.Info("CONFIG: %s= female: %d, male: %d\n", setting.first.c_str(), setting.second.female, setting.second.male);
         }
     }
 }
@@ -495,14 +470,14 @@ bool CheckConfigFilesChanged() {
     if (GetFileModificationTime(mainINIPath, &currentMainTime)) {
         if (CompareFileTime(&currentMainTime, &lastMainINITime) != 0) {
             mainINIChanged = true;
-            logger.Info("Main INI file changed, reloading config\n");
+            logger.Info("CONFIG: Main INI file changed, reloading config\n");
         }
     }
     
     if (GetFileModificationTime(mcmINIPath, &currentMCMTime)) {
         if (CompareFileTime(&currentMCMTime, &lastMCMINITime) != 0) {
             mcmINIChanged = true;
-            logger.Info("MCM INI file changed, reloading config\n");
+            logger.Info("CONFIG: MCM INI file changed, reloading config\n");
         }
     }
     
