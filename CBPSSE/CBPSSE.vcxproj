@@ -148,6 +148,12 @@
       <AdditionalDependencies>$(OutDir)f4se_1_11_191.lib;$(OutDir)f4se_common.lib;$(OutDir)common_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference />
+    <PostBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -File "$(SolutionDir)Tools\build-package.ps1"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Construct installable mod package</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\detourxs-master\detourxs.h" />
@@ -175,6 +181,7 @@
     <ClInclude Include="log.h" />
     <ClInclude Include="Thing.h" />
     <ClInclude Include="unordered_dense.h" />
+    <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\detourxs-master\detourxs.cpp" />

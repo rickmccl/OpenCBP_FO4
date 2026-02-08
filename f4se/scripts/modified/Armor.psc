@@ -1,2 +1,0 @@
-
-ArmorAddon[] Function GetArmorAddons() native
