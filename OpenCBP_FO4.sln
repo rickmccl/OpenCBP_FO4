@@ -16,6 +16,47 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common_vc", "common\common_
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		tools\build-package.ps1 = tools\build-package.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modpackage", "Modpackage", "{72DE9BE4-4325-4D72-8400-16F5AE73241C}"
+	ProjectSection(SolutionItems) = preProject
+		modpackage\OCBP_LICENSE = modpackage\OCBP_LICENSE
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{370BB06D-C637-4253-BB4B-39938578EBCB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "F4SE", "F4SE", "{A0148772-D12D-444E-BC33-3F11612CABFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{B076409A-7B0A-48EF-935E-20275F5C1E48}"
+	ProjectSection(SolutionItems) = preProject
+		modpackage\Data\Scripts\OCBP_API.pex = modpackage\Data\Scripts\OCBP_API.pex
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MCM", "MCM", "{9DBE74A3-9265-4C64-837A-93373EDCDC1D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{451FD5CE-2FCF-43EE-9F80-D8EDDACE2302}"
+	ProjectSection(SolutionItems) = preProject
+		modpackage\Data\F4SE\Plugins\ocbp.ini = modpackage\Data\F4SE\Plugins\ocbp.ini
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{0909FE4A-16C4-448B-AE12-4A0F492ABC6F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OCBP", "OCBP", "{BC90FCB7-1CD8-4C9F-8259-E6D7D085FCFE}"
+	ProjectSection(SolutionItems) = preProject
+		modpackage\Data\MCM\Config\OCBP\config.json = modpackage\Data\MCM\Config\OCBP\config.json
+		modpackage\Data\MCM\Config\OCBP\settings.ini = modpackage\Data\MCM\Config\OCBP\settings.ini
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{290B1C50-82F6-4DF1-980D-0B09FD2C581B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "User", "User", "{C88208F3-14FF-4E4A-A148-0296E664683A}"
+	ProjectSection(SolutionItems) = preProject
+		modpackage\Data\Scripts\Source\User\OCBP_API.psc = modpackage\Data\Scripts\Source\User\OCBP_API.psc
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -53,6 +94,19 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
+		{72DE9BE4-4325-4D72-8400-16F5AE73241C} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
+		{370BB06D-C637-4253-BB4B-39938578EBCB} = {72DE9BE4-4325-4D72-8400-16F5AE73241C}
+		{A0148772-D12D-444E-BC33-3F11612CABFB} = {370BB06D-C637-4253-BB4B-39938578EBCB}
+		{B076409A-7B0A-48EF-935E-20275F5C1E48} = {370BB06D-C637-4253-BB4B-39938578EBCB}
+		{9DBE74A3-9265-4C64-837A-93373EDCDC1D} = {370BB06D-C637-4253-BB4B-39938578EBCB}
+		{451FD5CE-2FCF-43EE-9F80-D8EDDACE2302} = {A0148772-D12D-444E-BC33-3F11612CABFB}
+		{0909FE4A-16C4-448B-AE12-4A0F492ABC6F} = {9DBE74A3-9265-4C64-837A-93373EDCDC1D}
+		{BC90FCB7-1CD8-4C9F-8259-E6D7D085FCFE} = {0909FE4A-16C4-448B-AE12-4A0F492ABC6F}
+		{290B1C50-82F6-4DF1-980D-0B09FD2C581B} = {B076409A-7B0A-48EF-935E-20275F5C1E48}
+		{C88208F3-14FF-4E4A-A148-0296E664683A} = {290B1C50-82F6-4DF1-980D-0B09FD2C581B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D33D2E5-D630-4EC6-83EB-A096B4E098CE}
