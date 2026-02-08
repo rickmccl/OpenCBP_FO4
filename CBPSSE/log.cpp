@@ -91,7 +91,6 @@ void CbpLogger::Debug(const char *fmt...) {
 }
 
 // Initialize logger and set debug enabled based on config default
-// CbpLogger logger("Data\\F4SE\\Plugins\\cbp.log");
-CbpLogger logger("cbp.log");
+CbpLogger logger("Data\\F4SE\\Plugins\\cbp.log");
 
 // Default debug state will be set by config::LoadConfig (or defaults). Keep debug off by default.
