@@ -146,12 +146,12 @@ void UpdateActors() {
         if (currentFPS < (targetFPS - FPS_HYSTERESIS) && currentFPS < (lastAdjustmentFPS - FPS_HYSTERESIS)) {
             dynamicMaxActors = max(1, dynamicMaxActors - 1);
             lastAdjustmentFPS = currentFPS;
-            logger.Info("Auto FPS: Reducing actors to %d (FPS: %.1f, Target: %d)\n", dynamicMaxActors, currentFPS, targetFPS);
+            logger.Info("Auto FPS: Reducing actor limit to %d (Physics FPS: %.1f, Target: %d)\n", dynamicMaxActors, currentFPS, targetFPS);
         } else if (currentFPS > (targetFPS + FPS_HYSTERESIS) && dynamicMaxActors < max_active_actors) {
             if (currentFPS > (lastAdjustmentFPS + FPS_HYSTERESIS)) {
                 dynamicMaxActors = min(max_active_actors, dynamicMaxActors + 1);
                 lastAdjustmentFPS = currentFPS;
-                logger.Info("Auto FPS: Increasing actors to %d (FPS: %.1f, Target: %d)\n", dynamicMaxActors, currentFPS, targetFPS);
+                logger.Info("Auto FPS: Increasing actor limit to %d (Physics FPS: %.1f, Target: %d)\n", dynamicMaxActors, currentFPS, targetFPS);
             }
         }
     } else {
@@ -277,7 +277,7 @@ void UpdateActors() {
         actorEntries.insert(actorEntries.end(), normalActors.begin(), normalActors.end());
         
         if (exceptionActors.size() > 0) {
-            logger.Info("Auto FPS: %d exception actors + %d normal actors (total: %d)\n", 
+            logger.Info("Auto FPS: tracking %d exception actors + %d normal actors (total: %d)\n", 
                         exceptionActors.size(), normalActors.size(), actorEntries.size());
         }
     } else {
@@ -306,6 +306,7 @@ void UpdateActors() {
     //}
 
     // File watcher: check if config files changed
+	// I'm suspicious of the performance of this, but it only does anything if files changed, so far it is ok. We can optimize later if needed.
     if (CheckConfigFilesChanged()) {
         auto reloadActors = LoadConfig();
         for (auto &a : actors) {

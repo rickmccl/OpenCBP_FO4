@@ -27,9 +27,10 @@ void Thing::ShowPos(NiPoint3& p) {
 }
 
 void Thing::ShowRot(NiMatrix43& r) {
-    logger.Info("%8.4f %8.4f %8.4f %8.4f\n", r.data[0][0], r.data[0][1], r.data[0][2], r.data[0][3]);
-    logger.Info("%8.4f %8.4f %8.4f %8.4f\n", r.data[1][0], r.data[1][1], r.data[1][2], r.data[1][3]);
-    logger.Info("%8.4f %8.4f %8.4f %8.4f\n", r.data[2][0], r.data[2][1], r.data[2][2], r.data[2][3]);
+	logger.Debug("Rotation Matrix:\n");
+    logger.Debug("%8.4f %8.4f %8.4f %8.4f\n", r.data[0][0], r.data[0][1], r.data[0][2], r.data[0][3]);
+    logger.Debug("%8.4f %8.4f %8.4f %8.4f\n", r.data[1][0], r.data[1][1], r.data[1][2], r.data[1][3]);
+    logger.Debug("%8.4f %8.4f %8.4f %8.4f\n", r.data[2][0], r.data[2][1], r.data[2][2], r.data[2][3]);
 }
 
 Thing::Thing(NiAVObject* obj, BSFixedString& name)
@@ -244,7 +245,8 @@ void Thing::Update(Actor *actor) {
         skeletonObj = skeletonObj->m_parent;
     }
     if (skeletonFound == false) {
-        logger.Info("Couldn't find skeleton for actor %08x\n", actor->formID);
+        // common event while game is loading, therefore not an error
+        logger.Debug("Couldn't find skeleton for actor %08x\n", actor->formID);
         return;
     }
 

@@ -36,9 +36,10 @@ bool SimObj::Bind(Actor *actor, std::vector<std::string>& boneNames, config_t &c
             BSFixedString cs(bone_c_str);
             auto bone = loadedData->rootNode->GetObjectByName(&cs);
             if (!bone) {
-                logger.Info("Failed to find Bone %s for actor %08x\n", b.c_str(), actor->formID);
+				// these messages are common and don't indicate a problem, so use debug level
+                logger.Debug("Failed to find Bone %s for actor %08x\n", b.c_str(), actor->formID);
             } else {
-                //logger.info("Doing Bone %s for actor %08x\n", b, actor->formID);
+                logger.Debug("Doing Bone %s for actor %08x\n", b, actor->formID);
                 things.emplace(b, Thing(bone, cs));
             }
         }
