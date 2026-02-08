@@ -264,8 +264,10 @@ __pycache__/
 skse64/
 /skse64_se
 
+#0wizard:
 # The files to be merged in
 CBPSSE-0.4/
-
 #Notepad++
 *.bak
+#F4SE project
+f4se/
