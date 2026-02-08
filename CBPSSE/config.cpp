@@ -89,9 +89,6 @@ bool LoadConfig() {
     logConsolidationEnabled = configReader.GetBoolean("General", "logConsolidationEnabled", true);
     logger.SetConsolidationEnabled(logConsolidationEnabled);
 
-    logger.Info("CONFIG: Logging: %s | Consolidation: %s\n",
-                loggingEnabled ? "enabled" : "disabled",
-                logConsolidationEnabled ? "enabled" : "disabled");
 
     // Read defaults from config (INI)
     bool cfg_playerOnly = configReader.GetBoolean("General", "playerOnly", false);
@@ -175,7 +172,7 @@ bool LoadConfig() {
     }
     logger.Info("CONFIG: autoWhitelist=%s (source: %s)\n",
                 autoWhitelist ? "true" : "false",
-                mcmHasKey("autoWhitelist") ? "MCM" : "INI");
+                mcmHasKey("bautoWhitelist") ? "MCM" : "INI");
 
     if (mcmHasKey("bDetectArmor")) {
         detectArmor = mcmReader.GetBoolean("General", "bDetectArmor", cfg_detectArmor);
