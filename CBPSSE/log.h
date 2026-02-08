@@ -1,10 +1,12 @@
 #pragma once
 #include <stdio.h>
 #include <string>
+#include <cstdarg>
 
 enum class LogLevel {
     Info,
-    Error
+    Error,
+    Debug
 };
 
 class CbpLogger {
@@ -13,9 +15,11 @@ public:
     ~CbpLogger();
     
     void SetLoggingEnabled(bool enabled);
+    void SetDebugEnabled(bool enabled);
     void SetConsolidationEnabled(bool enabled);
     void Info(const char* fmt...);
     void Error(const char* fmt...);
+    void Debug(const char* fmt...);
 
 private:
     void Write(LogLevel level, const char* fmt, va_list args);
@@ -23,6 +27,7 @@ private:
     FILE* handle;
     std::string lastMessage;
     bool loggingEnabled;
+    bool debugEnabled;
     bool consolidationEnabled;
 };
 

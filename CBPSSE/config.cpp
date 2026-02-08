@@ -238,6 +238,21 @@ bool LoadConfig() {
                 autoExceptions,
                 mcmHasKey("iAutoExceptions") ? "MCM" : "INI");
 
+        // Read debug logging setting (defaults to false)
+    bool cfg_debugLogging = configReader.GetBoolean("General", "debugLogging", false);
+    bool debugLogging = cfg_debugLogging;
+    if (mcmHasKey("bDebugLogging")) {
+        debugLogging = mcmReader.GetBoolean("General", "bDebugLogging", cfg_debugLogging);
+    }
+    logger.SetDebugEnabled(debugLogging);
+
+    logger.Info("CONFIG: Logging: %s | Consolidation: %s\n",
+        loggingEnabled ? "enabled" : "disabled",
+        logConsolidationEnabled ? "enabled" : "disabled");
+
+    logger.Info("CONFIG: Debug logging: %s\n", debugLogging ? "enabled" : "disabled");
+
+    // config is read; if actor selectors changed we can run reloadActors
     reloadActors = (playerOnly ^ playerOnlyOld) ||
                     (femaleOnly ^ femaleOnlyOld) ||
                     (maleOnly ^ maleOnlyOld) ||

@@ -25,6 +25,10 @@ void CbpLogger::SetLoggingEnabled(bool enabled) {
     loggingEnabled = enabled;
 }
 
+void CbpLogger::SetDebugEnabled(bool enabled) {
+    debugEnabled = enabled;
+}
+
 void CbpLogger::SetConsolidationEnabled(bool enabled) {
     consolidationEnabled = enabled;
     if (!consolidationEnabled) {
@@ -34,6 +38,9 @@ void CbpLogger::SetConsolidationEnabled(bool enabled) {
 
 void CbpLogger::Write(LogLevel level, const char *fmt, va_list args) {
     if (!loggingEnabled || !handle) return;
+
+    // Respect debug filter: skip debug messages when disabled
+    if (level == LogLevel::Debug && !debugEnabled) return;
 
 	// Format the message into a temporary buffer. copy the args list so multiple messages can be handled at once.
     char buffer[4096]; 
@@ -54,7 +61,9 @@ void CbpLogger::Write(LogLevel level, const char *fmt, va_list args) {
     lastMessage = buffer;
 
     // Write level tag and message
-    const char* levelStr = (level == LogLevel::Error) ? "[NOTICE] " : "[INFO] ";
+    const char* levelStr = "[INFO] ";
+    if (level == LogLevel::Error) levelStr = "[NOTICE] ";
+    else if (level == LogLevel::Debug) levelStr = "[DEBUG] ";
     fprintf(handle, "%s%s", levelStr, buffer);
     fflush(handle);
 }
@@ -73,4 +82,15 @@ void CbpLogger::Error(const char *fmt...) {
     va_end(argptr);
 }
 
-CbpLogger logger("Data\\F4SE\\Plugins\\cbp.log");
+void CbpLogger::Debug(const char *fmt...) {
+    va_list argptr;
+    va_start(argptr, fmt);
+    Write(LogLevel::Debug, fmt, argptr);
+    va_end(argptr);
+}
+
+// Initialize logger and set debug enabled based on config default
+// CbpLogger logger("Data\\F4SE\\Plugins\\cbp.log");
+CbpLogger logger("cbp.log");
+
+// Default debug state will be set by config::LoadConfig (or defaults). Keep debug off by default.
