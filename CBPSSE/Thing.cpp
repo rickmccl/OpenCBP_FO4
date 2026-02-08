@@ -23,7 +23,7 @@ pos_map Thing::origLocalPos;
 rot_map Thing::origLocalRot;
 
 void Thing::ShowPos(NiPoint3& p) {
-    logger.Info("%8.4f %8.4f %8.4f\n", p.x, p.y, p.z);
+    logger.Debug("%8.4f %8.4f %8.4f\n", p.x, p.y, p.z);
 }
 
 void Thing::ShowRot(NiMatrix43& r) {
@@ -130,7 +130,7 @@ NiAVObject* Thing::IsActorValid(Actor* actor) {
     }
 
     if (!obj->m_parent) {
-        logger.Error("Couldn't get bone %s parent for actor %08x\n", boneName.c_str(), actor->formID);
+        logger.debug("Couldn't get bone %s parent for actor %08x\n", boneName.c_str(), actor->formID);
         return NULL;
     }
 
@@ -162,13 +162,13 @@ void Thing::Update(Actor *actor) {
     auto sceneObj = obj;
     while (sceneObj->m_parent && sceneObj->m_name != "skeleton.nif")
     {
-        logger.Info(sceneObj->m_name);
-        logger.Info("\n---\n");
-        logger.Error("Actual m_localTransform.pos: ");
+        logger.Debug(sceneObj->m_name);
+        logger.Debug("\n---\n");
+        logger.Debug("Actual m_localTransform.pos: ");
         ShowPos(sceneObj->m_localTransform.pos);
-        logger.Error("Actual m_worldTransform.pos: ");
+        logger.Debug("Actual m_worldTransform.pos: ");
         ShowPos(sceneObj->m_worldTransform.pos);
-        logger.Info("---\n");
+        logger.Debug("---\n");
         //logger.Error("Actual m_localTransform.rot Matrix:\n");
         ShowRot(sceneObj->m_localTransform.rot);
         //logger.Error("Actual m_worldTransform.rot Matrix:\n");
@@ -190,8 +190,8 @@ void Thing::Update(Actor *actor) {
 
     if (origLocalPos_iter == origLocalPos.end()) {
 #ifdef DEBUG
-        logger.Error("for bone %s, actor %08x: \n", boneName.c_str(), actor->formID);
-        logger.Error("firstRun pos Set: \n");
+        logger.Debug("for bone %s, actor %08x: \n", boneName.c_str(), actor->formID);
+        logger.Debug("firstRun pos Set: \n");
 #endif  
         origLocalPos[boneName.c_str()][actor->formID] = obj->m_localTransform.pos;
         ShowPos(obj->m_localTransform.pos);
@@ -201,8 +201,8 @@ void Thing::Update(Actor *actor) {
         auto actor_iter = actorPosMap.find(actor->formID);
         if (actor_iter == actorPosMap.end()) {
 #ifdef DEBUG
-            logger.Error("for bone %s, actor %08x: \n", boneName.c_str(), actor->formID);
-            logger.Error("firstRun pos Set: \n");
+            logger.Debug("for bone %s, actor %08x: \n", boneName.c_str(), actor->formID);
+            logger.Debug("firstRun pos Set: \n");
 #endif
             origLocalPos[boneName.c_str()][actor->formID] = obj->m_localTransform.pos;
             ShowPos(obj->m_localTransform.pos);
@@ -210,8 +210,8 @@ void Thing::Update(Actor *actor) {
     }
     if (origLocalRot_iter == origLocalRot.end()) {
 #ifdef DEBUG
-        logger.Error("for bone %s, actor %08x: \n", boneName.c_str(), actor->formID);
-        logger.Error("firstRun rot Set:\n");
+        logger.Debug("for bone %s, actor %08x: \n", boneName.c_str(), actor->formID);
+        logger.Debug("firstRun rot Set:\n");
 #endif // DEBUG
         origLocalRot[boneName.c_str()][actor->formID] = obj->m_localTransform.rot;
         ShowRot(obj->m_localTransform.rot);
@@ -221,8 +221,8 @@ void Thing::Update(Actor *actor) {
         auto actor_iter = actorRotMap.find(actor->formID);
         if (actor_iter == actorRotMap.end()) {
 #ifdef DEBUG
-            logger.Error("for bone %s, actor %08x: \n", boneName.c_str(), actor->formID);
-            logger.Error("firstRun rot Set: \n");
+            logger.Debug("for bone %s, actor %08x: \n", boneName.c_str(), actor->formID);
+            logger.Debug("firstRun rot Set: \n");
 #endif // DEBUG
             origLocalRot[boneName.c_str()][actor->formID] = obj->m_localTransform.rot;
             ShowRot(obj->m_localTransform.rot);
@@ -251,7 +251,7 @@ void Thing::Update(Actor *actor) {
     }
 
 #if DEBUG
-    logger.Error("bone %s for actor %08x with parent %s\n", boneName.c_str(), actor->formID, skeletonObj->m_name.c_str());
+    logger.Debug("bone %s for actor %08x with parent %s\n", boneName.c_str(), actor->formID, skeletonObj->m_name.c_str());
     ShowRot(skeletonObj->m_worldTransform.rot);
     //ShowPos(obj->m_parent->m_worldTransform.rot.Transpose() * obj->m_localTransform.pos);
 #endif
@@ -262,7 +262,7 @@ void Thing::Update(Actor *actor) {
     NiPoint3 target = (targetRot * NiPoint3(cogOffsetX, cogOffsetY, cogOffsetZ)) + origWorldPos;
 
 #if DEBUG
-    logger.Error("World Position: ");
+    logger.Debug("World Position: ");
     ShowPos(obj->m_worldTransform.pos);
     //logger.Error("Parent World Position difference: ");
     //ShowPos(obj->m_worldTransform.pos - obj->m_parent->m_worldTransform.pos);
@@ -270,11 +270,11 @@ void Thing::Update(Actor *actor) {
     ShowPos(targetRot * NiPoint3(cogOffsetX, cogOffsetY, cogOffsetZ));
     //logger.Error("Target Rotation:\n");
     //ShowRot(targetRot);
-    logger.Error("cogOffset x Transformation:");
+    logger.Debug("cogOffset x Transformation:");
     ShowPos(targetRot * NiPoint3(cogOffsetX, 0, 0));
-    logger.Error("cogOffset y Transformation:");
+    logger.Debug("cogOffset y Transformation:");
     ShowPos(targetRot * NiPoint3(0, cogOffsetY, 0));
-    logger.Error("cogOffset z Transformation:");
+    logger.Debug("cogOffset z Transformation:");
     ShowPos(targetRot * NiPoint3(0, 0, cogOffsetZ));
 #endif
 
@@ -285,12 +285,12 @@ void Thing::Update(Actor *actor) {
     diff += targetRot * NiPoint3(0, 0, gravityCorrection);
 
 #if DEBUG
-    logger.Error("Diff after gravity correction %f: ", gravityCorrection);
+    logger.Debug("Diff after gravity correction %f: ", gravityCorrection);
     ShowPos(diff);
 #endif
 
     if (fabs(diff.x) > 100 || fabs(diff.y) > 100 || fabs(diff.z) > 100) {
-        logger.Error("transform reset\n");
+        logger.Debug("transform reset\n");
         obj->m_localTransform.pos = origLocalPos[boneName.c_str()][actor->formID];
         oldWorldPos = target;
         velocity = NiPoint3(0, 0, 0);
@@ -340,9 +340,9 @@ void Thing::Update(Actor *actor) {
             NiPoint3 force = (iterationDiff * stiffness) + (diff2 * stiffness2) - (targetRot * NiPoint3(0, 0, gravityBias));
 
 #if DEBUG
-            logger.Error("Iteration Diff: ");
+            logger.Debug("Iteration Diff: ");
             ShowPos(iterationDiff);
-            logger.Error("Force with stiffness %f, stiffness2 %f, gravity bias %f: ", stiffness, stiffness2, gravityBias);
+            logger.Debug("Force with stiffness %f, stiffness2 %f, gravity bias %f: ", stiffness, stiffness2, gravityBias);
             ShowPos(force);
 #endif
 
@@ -361,7 +361,7 @@ void Thing::Update(Actor *actor) {
 #if DEBUG
         //logger.Error("posDelta: ");
         //ShowPos(posDelta);
-        logger.Error("newPos: ");
+        logger.Debug("newPos: ");
         ShowPos(newPos);
 #endif
         // clamp the difference to stop the breast severely lagging at low framerates
@@ -372,7 +372,7 @@ void Thing::Update(Actor *actor) {
         diff.z = clamp(diff.z - gravityCorrection, -maxOffsetZ, maxOffsetZ) + gravityCorrection;
 
 #if DEBUG
-        logger.Error("diff from newPos: ");
+        logger.Debug("diff from newPos: ");
         ShowPos(diff);
         //logger.Error("oldWorldPos: ");
         //ShowPos(oldWorldPos);
@@ -400,19 +400,19 @@ void Thing::Update(Actor *actor) {
         localDiff = invRot * localDiff;
         oldWorldPos = diff + target;
 #if DEBUG
-        logger.Error("invRot x=10 Transformation:");
+        logger.Debug("invRot x=10 Transformation:");
         ShowPos(invRot * NiPoint3(10, 0, 0));
-        logger.Error("invRot y=10 Transformation:");
+        logger.Debug("invRot y=10 Transformation:");
         ShowPos(invRot * NiPoint3(0, 10, 0));
-        logger.Error("invRot z=10 Transformation:");
+        logger.Debug("invRot z=10 Transformation:");
         ShowPos(invRot * NiPoint3(0, 0, 10));
-        logger.Error("oldWorldPos: ");
+        logger.Debug("oldWorldPos: ");
         ShowPos(oldWorldPos);
-        logger.Error("localTransform.pos: ");
+        logger.Debug("localTransform.pos: ");
         ShowPos(obj->m_localTransform.pos);
-        logger.Error("localDiff: ");
+        logger.Debug("localDiff: ");
         ShowPos(localDiff);
-        logger.Error("rotDiff: ");
+        logger.Debug("rotDiff: ");
         ShowPos(rotDiff);
 
 #endif
@@ -431,11 +431,11 @@ void Thing::Update(Actor *actor) {
 
 
 #if DEBUG
-        logger.Error("localTransform.pos after: ");
+        logger.Debug("localTransform.pos after: ");
         ShowPos(obj->m_localTransform.pos);
-        logger.Error("origLocalPos:");
+        logger.Debug("origLocalPos:");
         ShowPos(origLocalPos[boneName.c_str()][actor->formID]);
-        logger.Error("origLocalRot:");
+        logger.Debug("origLocalRot:");
         ShowRot(origLocalRot[boneName.c_str()][actor->formID]);
 
 #endif
@@ -452,7 +452,7 @@ void Thing::Update(Actor *actor) {
         obj->m_localTransform.rot = standardRot * origLocalRot[boneName.c_str()][actor->formID];
     }
 #if DEBUG
-    logger.Error("end update()\n");
+    logger.Debug("end update()\n");
 #endif
 
     //logger.Error("end update()\n");
