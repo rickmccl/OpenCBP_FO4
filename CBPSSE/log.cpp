@@ -1,14 +1,15 @@
 #include <stdarg.h>
 #include <cstring>
 #include "log.h"
+#include "version.h"
 
 #pragma warning(disable : 4996)
 
 CbpLogger::CbpLogger(const char *fname) 
-    : handle(nullptr), loggingEnabled(true), consolidationEnabled(true) {
+    : handle(nullptr), loggingEnabled(true), consolidationEnabled(true), debugEnabled(false) {
     handle = fopen(fname, "w");  // Changed from "a" to "w" for truncate
     if (handle) {
-        fprintf(handle, "CBP Log initialized\n");
+        fprintf(handle, "OpenCBP version %s Log initialized\n", OCBP_VERSION_STR);
         fflush(handle);
     }
 }

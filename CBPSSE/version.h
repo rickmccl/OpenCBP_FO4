@@ -1,0 +1,7 @@
+#pragma once
+
+#define OCBP_VERSION_MAJOR 3
+#define OCBP_VERSION_MINOR 5
+#define OCBP_VERSION_PATCH 191
+
+#define OCBP_VERSION_STR "3.5.191"
