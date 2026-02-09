@@ -56,11 +56,20 @@ $buildPdb = Join-Path $solutionDir "x64\Release\CBP.pdb"
 
 $targetPluginDir = Join-Path $packageDir "Data\F4SE\Plugins"
 
-Write-Host "Injecting fresh CBP.dll and CBP.pdb..."
+Write-Host "Adding fresh CBP.dll and CBP.pdb..."
 Copy-Item $buildDll $targetPluginDir -Force
 Copy-Item $buildPdb $targetPluginDir -Force
 
-# --- 6. Optional: create ZIP ------------------------------------------------
+# --- 6. apply version number --------------------------------------
+
+$filetargets="$packageDir\Data\F4SE\Plugins\OCBP.ini","$packageDir\FOMOD\info.xml"
+foreach ($file in $filetargets) {
+    Write-Host "Stamping version number in $file"
+    (Get-Content $file) -replace "@VERSION@", $version | Set-Content $file
+    }
+    
+
+# --- 7. create ZIP ------------------------------------------------
 
 $zipPath = "$packageDir.zip"
 
