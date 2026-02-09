@@ -57,6 +57,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "User", "User", "{C88208F3-1
 		modpackage\Data\Scripts\Source\User\OCBP_API.psc = modpackage\Data\Scripts\Source\User\OCBP_API.psc
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FOMOD", "FOMOD", "{F71E1AE2-5E49-41F4-8715-EA83991DF919}"
+	ProjectSection(SolutionItems) = preProject
+		modpackage\FOMOD\info.xml = modpackage\FOMOD\info.xml
+		modpackage\FOMOD\Moduleconfig.xml = modpackage\FOMOD\Moduleconfig.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -107,6 +113,7 @@ Global
 		{BC90FCB7-1CD8-4C9F-8259-E6D7D085FCFE} = {0909FE4A-16C4-448B-AE12-4A0F492ABC6F}
 		{290B1C50-82F6-4DF1-980D-0B09FD2C581B} = {B076409A-7B0A-48EF-935E-20275F5C1E48}
 		{C88208F3-14FF-4E4A-A148-0296E664683A} = {290B1C50-82F6-4DF1-980D-0B09FD2C581B}
+		{F71E1AE2-5E49-41F4-8715-EA83991DF919} = {72DE9BE4-4325-4D72-8400-16F5AE73241C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D33D2E5-D630-4EC6-83EB-A096B4E098CE}
