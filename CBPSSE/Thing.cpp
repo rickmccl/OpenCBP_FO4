@@ -130,7 +130,7 @@ NiAVObject* Thing::IsActorValid(Actor* actor) {
     }
 
     if (!obj->m_parent) {
-        logger.debug("Couldn't get bone %s parent for actor %08x\n", boneName.c_str(), actor->formID);
+        logger.Debug("Couldn't get bone %s parent for actor %08x\n", boneName.c_str(), actor->formID);
         return NULL;
     }
 

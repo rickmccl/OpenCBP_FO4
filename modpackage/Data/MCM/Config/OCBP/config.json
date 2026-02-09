@@ -1,15 +1,15 @@
 {
   "modName": "OCBP",
-  "displayName": "OCBP Configuration",
+  "displayName": "OCBP",
   "minMcmVersion": 2,
   "pluginRequirements": [],
   "content": [
     {
-      "text": "OCBP Configuration",
+      "text": "OCBP",
       "type": "section"
     },
     {
-      "text": "OCBP FO4 is a physics modification plugin for Fallout 4 that provides custom body physics. This menu allows you to configure settings through MCM interface.",
+      "text": "OpenCBP FO4 is a physics modification plugin for Fallout 4 that provides custom body physics. This menu allows you to configure settings through MCM interface. These settings override entries in OCBP.ini.",
       "type": "text"
     }
   ],
@@ -57,7 +57,7 @@
             "sourceType": "ModSettingBool"
           }
         },
-		{
+        {
           "id": "bAutoWhitelist:General",
           "text": "Use Automatic Whitelist",
           "type": "switcher",
@@ -118,18 +118,50 @@
             "min": 1,
             "max": 50,
             "step": 1
-		   }
-		},
-		{
-          "id": "bDebugLogging:General",
+          }
+
+        }
+
+      ]
+    },
+    {
+      "pageDisplayName": "Logging",
+      "content": [
+        {
+          "text": "Logging",
+          "type": "section"
+        },
+        {
+          "text": "Logging controls"
+
+        },
+        {
+          "id": "bloggingEnabled:Logging",
+          "text": "Log: Enable logging",
+          "type": "switcher",
+          "help": "Enable or disable the CBP.log file",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "blogConsolidationEnabled:Logging",
+          "text": "Log: Consolidate repeated messages",
+          "type": "switcher",
+          "help": "Spam filter for log file drops duplicate messages",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bDebugLogging:Logging",
           "text": "Log: Enable debug level messsages",
           "type": "switcher",
-          "help": "Enable logging debug-level log messages",
+          "help": "Enable logging debug-level messages",
           "valueOptions": {
             "sourceType": "ModSettingBool"
           }
         }
-        
       ]
     }
   ]

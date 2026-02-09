@@ -27,7 +27,7 @@ bool npcOnly = false;
 bool detectArmor = false;
 bool useWhitelist = false;
 bool autoWhitelist = false;
-bool loggingEnabled = true;
+bool loggingEnabled = false;
 bool logConsolidationEnabled = true;
 float physic_distance_enable = 7500.0f;
 float physic_distance_disable = 8500.0f;
@@ -82,13 +82,6 @@ bool LoadConfig() {
         logger.Error("CONFIG: Found MCM settings, applying overrides\n");
     }
 
-    // Read logging settings first (affects subsequent log output)
-    loggingEnabled = configReader.GetBoolean("General", "loggingEnabled", true);
-    logger.SetLoggingEnabled(loggingEnabled);
-
-    logConsolidationEnabled = configReader.GetBoolean("General", "logConsolidationEnabled", true);
-    logger.SetConsolidationEnabled(logConsolidationEnabled);
-
 
     // Read defaults from config (INI)
     bool cfg_playerOnly = configReader.GetBoolean("General", "playerOnly", false);
@@ -96,30 +89,76 @@ bool LoadConfig() {
     bool cfg_femaleOnly = configReader.GetBoolean("General", "femaleOnly", false);
     bool cfg_maleOnly = configReader.GetBoolean("General", "maleOnly", false);
     bool cfg_useWhitelist = configReader.GetBoolean("General", "useWhitelist", false);
-    bool cfg_autoWhitelist = configReader.GetBoolean("General", "autoWhitelist", false);
+    bool cfg_autoWhitelist = configReader.GetBoolean("General", "autoWhitelist", true);
     bool cfg_detectArmor = configReader.GetBoolean("General", "detectArmor", false);
 
     float cfg_physic_distance_enable = configReader.GetFloat("General", "physic_distance_enable", 7500.0f);
     float cfg_physic_distance_disable = configReader.GetFloat("General", "physic_distance_disable", 8500.0f);
-    int   cfg_max_active_actors = configReader.GetInteger("General", "max_active_actors", 10);
+    int   cfg_max_active_actors = configReader.GetInteger("General", "max_active_actors", 16);
+    int   cfg_autoMode = configReader.GetInteger("General", "autoMode", 1);
+    int   cfg_targetFPS = configReader.GetInteger("General", "targetFPS", 60);
+    int   cfg_autoExceptions = configReader.GetInteger("General", "autoExceptions", 1);
 
-    int cfg_autoMode = configReader.GetInteger("General", "autoMode", 0);
-    int cfg_targetFPS = configReader.GetInteger("General", "targetFPS", 60);
-    int cfg_autoExceptions = configReader.GetInteger("General", "autoExceptions", 1);
-
+	bool cfg_loggingEnabled = configReader.GetBoolean("Logging", "loggingEnabled", false);
+	bool cfg_logConsolidationEnabled = configReader.GetBoolean("Logging", "logConsolidationEnabled", true);
+	bool cfg_debugEnabled = configReader.GetBoolean("Logging", "debugEnabled", false);
+    
+    
     // Determine if MCM provided a [General] section and helper to test for key presence
     bool mcmHasGeneral = hasMCM && (mcmReader.Sections().count("General") > 0);
+	bool mcmHasLogging = hasMCM && (mcmReader.Sections().count("Logging") > 0);
 
     auto mcmHasKey = [&](const char* key) -> bool {
-        if (!mcmHasGeneral) return false;
+        if (!mcmHasGeneral && !mcmHasLogging) return false;
         try {
-            return mcmReader.Section("General").count(key) > 0;
+bool found = false;
+
+if (mcmHasGeneral)
+    found |= mcmReader.Section("General").count(key) > 0;
+
+if (mcmHasLogging)
+    found |= mcmReader.Section("Logging").count(key) > 0;
+
+return found;
+
         } catch (...) {
             return false;
         }
     };
 
     // Apply per-key precedence: INI defaults first, then MCM only if the key exists there
+
+    if (mcmHasKey("bloggingEnabled")) {
+        loggingEnabled = mcmReader.GetBoolean("Logging", "bloggingEnabled", cfg_loggingEnabled);
+    } else {
+        loggingEnabled = cfg_loggingEnabled;
+	}
+    logger.SetLoggingEnabled(loggingEnabled);
+      
+    if (mcmHasKey("blogConsolidationEnabled")) {
+        logConsolidationEnabled = mcmReader.GetBoolean("Logging", "blogConsolidationEnabled", cfg_logConsolidationEnabled);
+    } else {
+        logConsolidationEnabled = cfg_logConsolidationEnabled;
+	}
+    logger.SetConsolidationEnabled(logConsolidationEnabled);
+
+    // Read debug logging setting (defaults to false)
+    bool cfg_debugLogging = configReader.GetBoolean("Logging", "debugLogging", false);
+    bool debugLogging = cfg_debugLogging;
+    if (mcmHasKey("bDebugLogging")) {
+        debugLogging = mcmReader.GetBoolean("Logging", "bDebugLogging", cfg_debugLogging);
+    }
+    logger.SetDebugEnabled(debugLogging);
+
+    logger.Info("CONFIG: Logging: %s | Consolidation: %s\n",
+        loggingEnabled ? "enabled" : "disabled",
+        logConsolidationEnabled ? "enabled" : "disabled");
+
+    logger.Info("CONFIG: Debug logging: %s\n", debugLogging ? "enabled" : "disabled");
+
+
+
+
     if (mcmHasKey("bPlayerOnly")) {
         playerOnly = mcmReader.GetBoolean("General", "bPlayerOnly", cfg_playerOnly);
     } else {
@@ -237,20 +276,6 @@ bool LoadConfig() {
     logger.Info("CONFIG: autoExceptions=%d (source: %s)\n",
                 autoExceptions,
                 mcmHasKey("iAutoExceptions") ? "MCM" : "INI");
-
-        // Read debug logging setting (defaults to false)
-    bool cfg_debugLogging = configReader.GetBoolean("General", "debugLogging", false);
-    bool debugLogging = cfg_debugLogging;
-    if (mcmHasKey("bDebugLogging")) {
-        debugLogging = mcmReader.GetBoolean("General", "bDebugLogging", cfg_debugLogging);
-    }
-    logger.SetDebugEnabled(debugLogging);
-
-    logger.Info("CONFIG: Logging: %s | Consolidation: %s\n",
-        loggingEnabled ? "enabled" : "disabled",
-        logConsolidationEnabled ? "enabled" : "disabled");
-
-    logger.Info("CONFIG: Debug logging: %s\n", debugLogging ? "enabled" : "disabled");
 
     // config is read; if actor selectors changed we can run reloadActors
     reloadActors = (playerOnly ^ playerOnlyOld) ||
