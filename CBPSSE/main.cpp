@@ -104,13 +104,13 @@ extern "C"
     {
         F4SEPluginVersionData::kVersion,
 
-        29,
+        30,
         "OpenCBP",
         "0wizard",
 
         0,	// not version independent
         0,	// not version independent (extended field)
-        { RUNTIME_VERSION_1_11_191, 0 },	                 // VERSION NUMBER UPDATE LOCATION
+        { RUNTIME_VERSION_1_11_221, 0 },	                 // VERSION NUMBER UPDATE LOCATION
 
         0,	// works with any version of the script extender. you probably do not need to put anything here
     };
@@ -131,7 +131,7 @@ extern "C"
             logger.Error("loaded in editor, marking as incompatible\n");
             return false;
         }
-        else if (f4se->runtimeVersion != RUNTIME_VERSION_1_11_191)   // VERSION NUMBER UPDATE LOCATION
+        else if (f4se->runtimeVersion != RUNTIME_VERSION_1_11_221)   // VERSION NUMBER UPDATE LOCATION
         {
             logger.Error("unsupported runtime version %08X", f4se->runtimeVersion);
             return false;

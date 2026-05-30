@@ -111,16 +111,8 @@ bool LoadConfig() {
     auto mcmHasKey = [&](const char* key) -> bool {
         if (!mcmHasGeneral && !mcmHasLogging) return false;
         try {
-bool found = false;
-
-if (mcmHasGeneral)
-    found |= mcmReader.Section("General").count(key) > 0;
-
-if (mcmHasLogging)
-    found |= mcmReader.Section("Logging").count(key) > 0;
-
-return found;
-
+            return (mcmReader.Section("General").count(key) > 0) || 
+                    (mcmReader.Section("Logging").count(key) > 0);
         } catch (...) {
             return false;
         }
