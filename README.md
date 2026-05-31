@@ -13,7 +13,7 @@ Visual Studio 2017 and later.
 - Thanks to EgoBallistic for pex and psc files  
 - Thanks to Takosako for https://github.com/ericncream/OpenCBP_FO4  
 - Thanks to Worthless99 for physics performance improvements, MCM, etc. 
-- Big thanks — impossible without Address Library and F4SE  
+- Big thanks: FudgyDuff and ianpatt/F4SE Team. Mods are built on their work
 
 ---
 
