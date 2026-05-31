@@ -1,3 +1,15 @@
+# 🛠️ OpenCBP_FO4 `3.5.221`  May 30 2026
+### F4SE Version: `0.7.8`  
+
+## Changes
+-support for game 1.11.221 released May 27 2026
+-Mod Config Menu integration refinement
+-refactor logging configuation settings
+-move log file to "My Documents" folder
+-revise level for some noisy log messages 
+-version numbering refactored and made accessible to the log packaging script
+-FOMOD installer to allow advanced user to skip installing new ocbp.ini
+
 # 🛠️ OpenCBP_FO4 `3.4.191`
 
 ### Game Version: `1.11.191`
