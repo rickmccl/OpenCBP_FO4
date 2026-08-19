@@ -21,7 +21,7 @@ void hk_ProcessEventQueue_Internal(void *thisPtr)
 // See f4se/Hooks_Threads.cpp
 // TODO someday address library.  someday.  
 // issue is with C++ standards differences between the projects. [RM]
-RelocPtr <void*> ProcessEventQueue_Internal(0x1B1DE30);
+RelocPtr <void*> ProcessEventQueue_Internal(0x1B1E2F0);
 
 /*
 [RickM:] 
@@ -32,6 +32,7 @@ version-1-11-137-0.txt:198184:2287625   1B1DFA0
 1-11-169 1B194C0
 version-1-11-191-0.txt:198154:2287625   1B1DD10
 version-1-11-221-0.txt:198145: 2287625  1B1DE30
+version-1-11-240-0.txt: 2287625 1B1E2F0
 */
 
 
