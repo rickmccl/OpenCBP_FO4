@@ -1,3 +1,9 @@
+# 🛠️ OpenCBP_FO4 `3.5.240`  Aug 20 2026
+### F4SE Version: `0.7.9`
+##Changes
+-support for game 1.11.240 released Aug 18 2026
+
+
 # 🛠️ OpenCBP_FO4 `3.5.221`  May 30 2026
 ### F4SE Version: `0.7.8`  
 
